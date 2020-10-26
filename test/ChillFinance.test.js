@@ -17,6 +17,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         this.weth = await WETH9.new({ from: alice });
         this.router = await UniswapV2Router01.new(this.factory.address, this.weth.address, { from: alice });
         this.chill = await ChillToken.new(this.router.address, this.factory.address, this.weth.address, { from: alice });
+        
         // this.chill = await ChillToken.new({ from: alice });
 
         // await this.chill.createPair(this.chill.address, this.weth.address, { from: alice });
