@@ -1,0 +1,48 @@
+{
+  "name": "ChillFinance",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "lint": "yarn prettier ./test/*.ts --check",
+    "lint:fix": "yarn prettier ./test/*.ts --write",
+    "clean": "rimraf ./build/",
+    "copy-v1-artifacts": "ncp ./buildV1 ./build",
+    "precompile": "yarn clean",
+    "compile": "waffle .waffle.json",
+    "postcompile": "yarn copy-v1-artifacts",
+    "pretest": "yarn compile",
+    "test": "mocha",
+    "prepublishOnly": "yarn test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openzeppelin/contracts": "^3.1.0",
+    "@openzeppelin/test-helpers": "^0.5.6",
+    "@truffle/hdwallet-provider": "^1.1.1",
+    "@uniswap/lib": "1.1.1",
+    "@uniswap/sdk": "^3.0.3",
+    "@uniswap/v2-core": "1.0.0",
+    "truffle": "^5.1.41",
+    "truffle-flattener": "^1.4.4"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.6",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "ethereum-waffle": "^2.4.1",
+    "ethereumjs-util": "^6.2.0",
+    "mocha": "^6.2.2",
+    "ncp": "^2.0.0",
+    "prettier": "^1.19.1",
+    "rimraf": "^3.0.0",
+    "solc": "0.6.6",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3"
+  }
+}
