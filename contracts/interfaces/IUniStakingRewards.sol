@@ -7,4 +7,5 @@ interface IUniStakingRewards {
     function withdraw(uint256 amount) external;
     function getReward() external;
     function exit() external;
+    function balanceOf(address account) external view returns (uint256);
 }
