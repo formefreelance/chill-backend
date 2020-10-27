@@ -7,7 +7,8 @@ Steps to run smart contracts:
 2). cd yield-backend
 3). yarn 
 3). truffle compile
-3). truffle test
+4). open another terminal and run 'ganache-cli -l 9000000 -g 20000000000'
+5). truffle test
 ```
 
 Deploy:
