@@ -42,15 +42,15 @@
     "absolutePath": "/C/AComputer/freelancer/formefreelance/chillfinance/chill_backend/contracts/interfaces/IUniswapV2Callee.sol",
     "exportedSymbols": {
       "IUniswapV2Callee": [
-        5034
+        5191
       ]
     },
-    "id": 5035,
+    "id": 5192,
     "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5022,
+        "id": 5179,
         "literals": [
           "solidity",
           ">=",
@@ -67,9 +67,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 5034,
+        "id": 5191,
         "linearizedBaseContracts": [
-          5034
+          5191
         ],
         "name": "IUniswapV2Callee",
         "nodeType": "ContractDefinition",
@@ -78,7 +78,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "10d1e85c",
-            "id": 5033,
+            "id": 5190,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -86,17 +86,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5031,
+              "id": 5188,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5024,
+                  "id": 5181,
                   "mutability": "mutable",
                   "name": "sender",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5033,
+                  "scope": 5190,
                   "src": "85:14:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -105,7 +105,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5023,
+                    "id": 5180,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "85:7:15",
@@ -120,12 +120,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5026,
+                  "id": 5183,
                   "mutability": "mutable",
                   "name": "amount0",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5033,
+                  "scope": 5190,
                   "src": "101:12:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -134,7 +134,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5025,
+                    "id": 5182,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "101:4:15",
@@ -148,12 +148,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5028,
+                  "id": 5185,
                   "mutability": "mutable",
                   "name": "amount1",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5033,
+                  "scope": 5190,
                   "src": "115:12:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -162,7 +162,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5027,
+                    "id": 5184,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "115:4:15",
@@ -176,12 +176,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5030,
+                  "id": 5187,
                   "mutability": "mutable",
                   "name": "data",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5033,
+                  "scope": 5190,
                   "src": "129:19:15",
                   "stateVariable": false,
                   "storageLocation": "calldata",
@@ -190,7 +190,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 5029,
+                    "id": 5186,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "129:5:15",
@@ -206,19 +206,19 @@
               "src": "84:65:15"
             },
             "returnParameters": {
-              "id": 5032,
+              "id": 5189,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "158:0:15"
             },
-            "scope": 5034,
+            "scope": 5191,
             "src": "62:97:15",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 5035,
+        "scope": 5192,
         "src": "28:134:15"
       }
     ],
@@ -228,15 +228,15 @@
     "absolutePath": "/C/AComputer/freelancer/formefreelance/chillfinance/chill_backend/contracts/interfaces/IUniswapV2Callee.sol",
     "exportedSymbols": {
       "IUniswapV2Callee": [
-        5034
+        5191
       ]
     },
-    "id": 5035,
+    "id": 5192,
     "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5022,
+        "id": 5179,
         "literals": [
           "solidity",
           ">=",
@@ -253,9 +253,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 5034,
+        "id": 5191,
         "linearizedBaseContracts": [
-          5034
+          5191
         ],
         "name": "IUniswapV2Callee",
         "nodeType": "ContractDefinition",
@@ -264,7 +264,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "10d1e85c",
-            "id": 5033,
+            "id": 5190,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -272,17 +272,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5031,
+              "id": 5188,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5024,
+                  "id": 5181,
                   "mutability": "mutable",
                   "name": "sender",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5033,
+                  "scope": 5190,
                   "src": "85:14:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -291,7 +291,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5023,
+                    "id": 5180,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "85:7:15",
@@ -306,12 +306,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5026,
+                  "id": 5183,
                   "mutability": "mutable",
                   "name": "amount0",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5033,
+                  "scope": 5190,
                   "src": "101:12:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -320,7 +320,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5025,
+                    "id": 5182,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "101:4:15",
@@ -334,12 +334,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5028,
+                  "id": 5185,
                   "mutability": "mutable",
                   "name": "amount1",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5033,
+                  "scope": 5190,
                   "src": "115:12:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -348,7 +348,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5027,
+                    "id": 5184,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "115:4:15",
@@ -362,12 +362,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5030,
+                  "id": 5187,
                   "mutability": "mutable",
                   "name": "data",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5033,
+                  "scope": 5190,
                   "src": "129:19:15",
                   "stateVariable": false,
                   "storageLocation": "calldata",
@@ -376,7 +376,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 5029,
+                    "id": 5186,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "129:5:15",
@@ -392,19 +392,19 @@
               "src": "84:65:15"
             },
             "returnParameters": {
-              "id": 5032,
+              "id": 5189,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "158:0:15"
             },
-            "scope": 5034,
+            "scope": 5191,
             "src": "62:97:15",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 5035,
+        "scope": 5192,
         "src": "28:134:15"
       }
     ],
@@ -416,7 +416,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.1",
-  "updatedAt": "2020-10-26T05:51:14.680Z",
+  "updatedAt": "2020-10-27T11:13:56.430Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

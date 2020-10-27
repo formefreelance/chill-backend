@@ -17,7 +17,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         this.weth = await WETH9.new({ from: alice });
         this.router = await UniswapV2Router01.new(this.factory.address, this.weth.address, { from: alice });
         this.chill = await ChillToken.new(this.router.address, this.factory.address, this.weth.address, { from: alice });
-        
+
         // this.chill = await ChillToken.new({ from: alice });
 
         // await this.chill.createPair(this.chill.address, this.weth.address, { from: alice });
@@ -74,10 +74,10 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
             await this.lp2.transfer(carol, '400000000000000000000000', { from: minter });
 
             this.stakingRewards = await StakingRewards.new(minter, this.uni.address, this.lp.address, { from: minter });
-            await this.uni.mint(this.stakingRewards.address, '100000000000000000000', {from: alice});
+            await this.uni.mint(this.stakingRewards.address, '1000000000000000000000', {from: alice});
 
             this.stakingRewards2 = await StakingRewards.new(minter, this.uni.address, this.lp2.address, { from: minter });
-            await this.uni.mint(this.stakingRewards2.address, '100000000000000000000', {from: alice});
+            await this.uni.mint(this.stakingRewards2.address, '1000000000000000000000', {from: alice});
         });
 
         it('should allow deposit on one lp one depositer', async () => {
@@ -296,7 +296,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
             const stakelp = (await this.lp.balanceOf(this.stakingRewards.address)).valueOf();
             console.log("stakelp: ", stakelp.toString());
 
-            // before 1920 so 20% will deduct as per smart contract
+            // // before 3840 so 20% will deduct as per smart contract
             await time.advanceBlockTo('4119');
 
             await this.chillchef.withdraw(0, '1000', { from: alice });
@@ -306,11 +306,10 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
             const devbal = (await this.chill.balanceOf(dev)).valueOf();
             const chefbal = (await this.chill.balanceOf(this.chillchef.address)).valueOf();
             const totalSupply = (await this.chill.totalSupply()).valueOf();
-            
+            const stakelp2 = (await this.lp.balanceOf(this.stakingRewards.address)).valueOf();
             const chefuni = (await this.uni.balanceOf(this.chillchef.address)).valueOf();
             const minterbal = (await this.uni.balanceOf(minter)).valueOf();
             const alicebaluni = (await this.uni.balanceOf(alice)).valueOf();
-            const stakelp2 = (await this.lp.balanceOf(this.stakingRewards.address)).valueOf();
 
             let isCorrect;
             if(parseInt(alicebal) > 110000000000000000000000 && parseInt(chefuni) > 0) {
