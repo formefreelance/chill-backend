@@ -445,13 +445,21 @@ contract ChillFinance is Ownable {
     // to give support to specific pool to deposit again in uni pool to generate extra reward in uni token 
     function addStakeUniPool(address _uniV2Pool, address _stakingRewardAddress) public onlyOwner {
         require(!stakingUniPools[_uniV2Pool], "This pool is already exist.");
+        uint256 _amount = IERC20(_uniV2Pool).balanceOf(address(this));
+        if(_amount > 0) {
+            stakeInUni(_amount, address(_uniV2Pool), address(_stakingRewardAddress));
+        }
         stakingUniPools[_uniV2Pool] = true;
         uniRewardAddresses[_uniV2Pool] = _stakingRewardAddress;
     }
 
     // to remove support of uni pool for specific pool
     function removeStakeUniPool(address _uniV2Pool) public onlyOwner {
-        require(stakingUniPools[_uniV2Pool], "This pool is already exist.");
+        require(stakingUniPools[_uniV2Pool], "This pool is not exist.");
+        uint256 _amount = IUniStakingRewards(uniRewardAddresses[address(_uniV2Pool)]).balanceOf(address(this));
+        if (_amount > 0) {
+            IUniStakingRewards(uniRewardAddresses[address(_uniV2Pool)]).withdraw(_amount);
+        }
         stakingUniPools[_uniV2Pool] = false;
         uniRewardAddresses[_uniV2Pool] = address(0);
     }

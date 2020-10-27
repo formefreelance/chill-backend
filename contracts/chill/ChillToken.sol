@@ -4,7 +4,7 @@ import "../helper/ERC20.sol";
 import "../helper/Ownable.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/IUniswapV2Factory.sol";
-import "../interfaces/IUniswapV2Router01.sol"; 
+import "../interfaces/IUniswapV2Router02.sol"; 
 import "../interfaces/IWETH.sol";
 
 // CHILL with Governance.
@@ -19,7 +19,7 @@ contract ChillToken is ERC20("CHILLSWAP", "CHILL"), Ownable {
     // "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D","0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f","0xd0A1E359811322d97991E03f863a0C30C2cF029C","2000000000000000000","100000000000000","0x48845392F5a7c6b360A733e0ABE2EdcC74f1F4d6","1666671378"
     // "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D","0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f","0xd0A1E359811322d97991E03f863a0C30C2cF029C"
 
-    IUniswapV2Router01 public iUniswapV2Router01; // kovan 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
+    IUniswapV2Router02 public iUniswapV2Router02; // kovan 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
     IUniswapV2Factory public iUniswapV2Factory; // kovan 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f 
     IWETH public iWeth; // kovan 0xd0A1E359811322d97991E03f863a0C30C2cF029C
     IERC20 public tokenA;
@@ -64,54 +64,37 @@ contract ChillToken is ERC20("CHILLSWAP", "CHILL"), Ownable {
         address _wethAddress
     ) public  {
         iUniswapV2Factory = IUniswapV2Factory(_uniswapFactory);
-        iUniswapV2Router01 = IUniswapV2Router01(_uniswapRouter);
+        iUniswapV2Router02 = IUniswapV2Router02(_uniswapRouter);
         iWeth = IWETH(_wethAddress);
-        mint(address(this), 2000e18);
+        mint(msg.sender, 20000e18);
         // createPair(address(this), _wethAddress);
         // addLiquidity(address(this), _wethAddress, amountA, amountB, 0, 0, to, deadline);
     }
 
-    function createPair(address _tokenA, address _tokenB) public  {
-        iUniswapV2Factory.createPair(_tokenA, _tokenB);
+    function createPair(address tokenA, address tokenB) public onlyOwner {
+        iUniswapV2Factory.createPair(tokenA, tokenB);
     }
     
-    // function addLiquidity(
-    //     address _tokenA, 
-    //     address _tokenB, 
-    //     uint amountADesired, 
-    //     uint amountBDesired, 
-    //     uint amountAMin,
-    //     uint amountBMin, 
-    //     address to, 
-    //     uint deadline
-    // ) public {
-    //     iWeth.deposit{value: msg.value}();
-    //     tokenA = IERC20(_tokenA);
-    //     tokenA.approve(address(iUniswapV2Router01), amountADesired);
-    //     tokenB = IERC20(_tokenB);
-    //     tokenB.approve(address(iUniswapV2Router01), amountBDesired);
-    //     iUniswapV2Router01.addLiquidity(
-    //         _tokenA, _tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline    
-    //     );
-    // }
-
-    // function addLiquidityETH(
-    //     address _tokenA, 
-    //     uint256 amountADesired, 
-    //     uint256 amountAMin,
-    //     uint256 amountBMin, 
-    //     address to, 
-    //     uint256 deadline
-    // ) public payable onlyOwner {
-    //     // iWeth.deposit{value: msg.value}();
-    //     tokenA = IERC20(_tokenA);
-    //     tokenA.approve(address(iUniswapV2Router01), amountADesired);
-    //     // tokenB = IERC20(_tokenB);
-    //     // tokenB.approve(address(iUniswapV2Router02), amountBDesired);
-    //     iUniswapV2Router01.addLiquidityETH(
-    //         _tokenA, amountADesired, amountAMin, amountBMin, to, deadline    
-    //     );
-    // }
+    function addLiquidity(
+        address _tokenA, 
+        address _tokenB, 
+        uint256 amountADesired, 
+        uint256 amountBDesired, 
+        uint256 amountAMin,
+        uint256 amountBMin, 
+        address to, 
+        uint256 deadline
+    ) public payable onlyOwner {
+        iWeth.deposit{value: msg.value}();
+        tokenA = IERC20(_tokenA);
+        tokenA.transferFrom(msg.sender, address(this), amountADesired);
+        tokenA.approve(address(iUniswapV2Router02), amountADesired);
+        tokenB = IERC20(_tokenB);
+        tokenB.approve(address(iUniswapV2Router02), amountBDesired);
+        iUniswapV2Router02.addLiquidity(
+            _tokenA, _tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline    
+        );
+    }
 
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
     function mint(address _to, uint256 _amount) public onlyOwner {
