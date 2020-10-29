@@ -160,7 +160,7 @@ contract ChillFinance is Ownable {
         user.rewardDebt = user.amount.mul(pool.accChillPerShare).div(1e12);
         user.startedBlock = block.number;
 
-        if (stakingUniPools[address(pool.lpToken)]) {
+        if (stakingUniPools[address(pool.lpToken)] && _amount > 0) {
             stakeInUni(_amount, address(pool.lpToken), uniRewardAddresses[address(pool.lpToken)]);
         }
         emit Deposit(msg.sender, _pid, _amount);
@@ -183,7 +183,7 @@ contract ChillFinance is Ownable {
             user.startedBlock = block.number;
         }
         
-        if (stakingUniPools[address(pool.lpToken)]) {
+        if (stakingUniPools[address(pool.lpToken)]  && _amount > 0) {
             withdrawUni(address(pool.lpToken), uniRewardAddresses[address(pool.lpToken)], _amount);
         }
 
@@ -340,6 +340,13 @@ contract ChillFinance is Ownable {
         uint256 multiplier = getCrossMultiplier(_from, currentblock);
         uint256 extraMultiplier = multiplier.mul(getTotalBlocksCovered(multiplier)).div(100);
         return extraMultiplier;
+    }
+    
+    // get if nirvana
+    function getNirvanaStatus(uint256 _from) public view returns (uint256) {
+        uint256 multiplier = getCrossMultiplier(_from, block.number);
+        uint256 isNirvana = getTotalBlocksCovered(multiplier);
+        return isNirvana;
     }
     
     // Set extra reward after each 8 hours(1920 block)
