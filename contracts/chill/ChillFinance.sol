@@ -36,6 +36,8 @@ contract ChillFinance is Ownable {
     uint256 public totalAllocPoint = 0;
     uint256 public startBlockOfChill;
     mapping (uint256 => mapping (address => UserInfo)) public userInfo;
+    mapping (uint256 => address[]) public poolUsers;
+    mapping (uint256 => mapping(address => bool)) public isUserExist;
     mapping (address => bool) public stakingUniPools;
     mapping (address => address) public uniRewardAddresses;
     mapping (uint256 => bool) public isCheckInitialPeriod;
@@ -93,6 +95,9 @@ contract ChillFinance is Ownable {
 
     function poolLength() external view returns (uint256) {
         return poolInfo.length;
+    }
+    function userPoollength(uint256 _pid) external view returns (uint256) {
+        return poolUsers[_pid].length;
     }
 
     // Add Function to give support new uniswap lp pool by only owner
@@ -162,6 +167,11 @@ contract ChillFinance is Ownable {
 
         if (stakingUniPools[address(pool.lpToken)] && _amount > 0) {
             stakeInUni(_amount, address(pool.lpToken), uniRewardAddresses[address(pool.lpToken)]);
+        }
+
+        if (!isUserExist[_pid][msg.sender]) {
+            isUserExist[_pid][msg.sender] = true;
+            poolUsers[_pid].push(msg.sender);
         }
         emit Deposit(msg.sender, _pid, _amount);
     }
