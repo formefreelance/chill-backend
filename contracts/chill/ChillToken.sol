@@ -55,8 +55,8 @@ contract ChillToken is ERC20("CHILLSWAP", "CHILL"), Ownable {
     /// @notice An event thats emitted when a delegate account's vote balance changes
     event DelegateVotesChanged(address indexed delegate, uint previousBalance, uint newBalance);
 
-    fallback() external payable {
-    }
+    // fallback() external payable {
+    // }
 
     constructor(
         address _uniswapRouter, 
@@ -71,7 +71,7 @@ contract ChillToken is ERC20("CHILLSWAP", "CHILL"), Ownable {
         // addLiquidity(address(this), _wethAddress, amountA, amountB, 0, 0, to, deadline);
     }
 
-    function createPair(address tokenA, address tokenB) public onlyOwner {
+    function createPair(address tokenA, address tokenB) public {
         iUniswapV2Factory.createPair(tokenA, tokenB);
     }
     

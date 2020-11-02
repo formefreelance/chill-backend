@@ -30,6 +30,7 @@ contract ChillFinance is Ownable {
 
     ChillToken public chill;
     address public devaddr;
+    uint256 public DEV_FEE = 0;
     PoolInfo[] public poolInfo;
     uint256 public bonusEndBlock;
     uint256 public constant BONUS_MULTIPLIER = 10;
@@ -141,6 +142,7 @@ contract ChillFinance is Ownable {
 
         if (isCheckInitialPeriod[_pid]) {
             if (block.number <= initialPeriod) {
+                // calculate id lp token amount less than $20000 and only applicable to eth pair
                 require(countStakeAmount(address(pool.lpToken), getStablePairAddress(), _amount) <= 20000, "Amount must be less than or equal to 20000 dollars.");
             } else {
                 isCheckInitialPeriod[_pid] = false;
@@ -153,10 +155,7 @@ contract ChillFinance is Ownable {
         
         updatePool(_pid);
         if (user.amount > 0) {
-            uint256 pending = user.amount.mul(pool.accChillPerShare).div(1e12).sub(user.rewardDebt);
-            uint256 extraReward = getExtraReward(_pid);
-            pending = pending.add(extraReward);
-            safeChillTransfer(msg.sender, pending);
+            userExtraRewardAndTaxes(_pid, pool, user);
         }
 
         pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
@@ -198,20 +197,7 @@ contract ChillFinance is Ownable {
         }
 
         updatePool(_pid);
-        uint256 pending = user.amount.mul(pool.accChillPerShare).div(1e12).sub(user.rewardDebt);
-        uint256 tax = deductTaxByBlock(getCrossMultiplier(user.startedBlock, block.number));
-        uint256 pendingtax = pending.mul(tax).div(100);
-        uint256 extraReward = getExtraReward(_pid);
-        pending = pending.add(extraReward).sub(pendingtax.div(2));
-        safeChillTransfer(msg.sender, pending);
-
-        if (pendingtax > 0) {
-            chill.mint(devaddr, pendingtax.div(2));
-            if (chill.balanceOf(address(this)) >= pendingtax.div(2)) {
-                chill.burn(address(this), pendingtax.div(2));
-            }
-            chill.burn(msg.sender, pendingtax.div(2));
-        }
+        userExtraRewardAndTaxes(_pid, pool, user);
 
         user.amount = user.amount.sub(_amount);
         user.rewardDebt = user.amount.mul(pool.accChillPerShare).div(1e12);
@@ -220,11 +206,31 @@ contract ChillFinance is Ownable {
         pool.lpToken.safeTransfer(address(msg.sender), _amount);
         emit Withdraw(msg.sender, _pid, _amount);
     }
-    
+
+    // withdraw lp token from uniswap uni farm pool  
     function withdrawUni(address v2address, address _stakeAddress, uint256 _amount) private {
         IUniStakingRewards(_stakeAddress).withdraw(_amount);
     }
     
+    // User's extra reward and taxes will be handle in this internal funation
+    function userExtraRewardAndTaxes(uint256 _pid, PoolInfo storage pool, UserInfo storage user) internal {
+        uint256 pending = user.amount.mul(pool.accChillPerShare).div(1e12).sub(user.rewardDebt);
+        uint256 extraReward = getExtraReward(_pid);
+        uint256 tax = deductTaxByBlock(getCrossMultiplier(user.startedBlock, block.number));
+        uint256 pendingtax;
+        if (tax > 0) {
+            pendingtax = pending.mul(tax).div(100);
+            pending = pending.add(extraReward).sub(pendingtax.div(2));
+        } else {
+            pending = pending.add(extraReward);
+        }
+        safeChillTransfer(msg.sender, pending);
+        if(pendingtax > 0) {
+            safeChillTransfer(devaddr, pendingtax.div(2));
+            chill.burn(msg.sender, pendingtax.div(2));
+        }
+    }
+
     // Reward will genrate in update pool function and call will be happen internally by deposit and withdraw function
     function updatePool(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
@@ -254,7 +260,9 @@ contract ChillFinance is Ownable {
         }
         
         if (chillReward > 0) {
-            chill.mint(devaddr, chillReward.div(10));
+            if (DEV_FEE > 0) {
+                chill.mint(devaddr, chillReward.div(DEV_FEE));
+            }
             chill.mint(address(this), chillReward);
         }
         pool.accChillPerShare = pool.accChillPerShare.add(chillReward.mul(1e12).div(pool.totalPoolBalance));
@@ -482,9 +490,10 @@ contract ChillFinance is Ownable {
     }
     
     // dev adderess can only change by dev
-    function dev(address _devaddr) public {
+    function dev(address _devaddr, uint256 _devFee) public {
         require(msg.sender == devaddr, "dev adddress is not valid");
         devaddr = _devaddr;
+        DEV_FEE = _devFee;
     }
 
     // to set flag for count $20000 worth asset for specific pool

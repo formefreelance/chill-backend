@@ -65,7 +65,7 @@ module.exports = {
         'mesh almost stairs envelope earth plastic interest hat stock camera panda boat', 
         `https://kovan.infura.io/v3/944f5399c18049d9920b3bc9c60583de`),
       network_id: 42,       // Ropsten's id
-      gas: 6500000,        // Ropsten has a lower block limit than mainnet
+      gas: 7500000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )

@@ -53,9 +53,9 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
         assert.equal((await this.chillchef.devaddr()).valueOf(), dev);
         // await expectRevert(this.chillchef.dev(bob, { from: dev }), 'dev: wut?');
-        await this.chillchef.dev(bob, { from: dev });
+        await this.chillchef.dev(bob, '0' , { from: dev });
         assert.equal((await this.chillchef.devaddr()).valueOf(), bob);
-        await this.chillchef.dev(alice, { from: bob });
+        await this.chillchef.dev(alice, '0', { from: bob });
         assert.equal((await this.chillchef.devaddr()).valueOf(), alice);
     });
 
@@ -89,24 +89,23 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
 
             await time.advanceBlockTo('400');
 
-            await this.lp.approve(this.chillchef.address, '100', { from: alice });
+            await this.lp.approve(this.chillchef.address, '100', { from: bob });
 
-            await this.chillchef.deposit(0, '100', { from: alice });
+            await this.chillchef.deposit(0, '100', { from: bob });
 
             await time.advanceBlockTo('700');
 
-            const pendingChillAlice = await this.chillchef.pendingChill(0, alice, { from: alice });
-            
-            await this.chillchef.withdraw(0, '100', { from: alice });
+            const pendingChillAlice = await this.chillchef.pendingChill(0, bob, { from: bob });
+            await this.chillchef.deposit(0, '0', { from: bob }); // harvest with 0 amount
+            await this.chillchef.withdraw(0, '100', { from: bob }); // harvest with 0 amount
 
-
-            const alicebal = (await this.chill.balanceOf(alice)).valueOf();
+            const bobbal = (await this.chill.balanceOf(bob)).valueOf();
             const devbal = (await this.chill.balanceOf(dev)).valueOf();
             const chefbal = (await this.chill.balanceOf(this.chillchef.address)).valueOf();
             const totalSupply = (await this.chill.totalSupply()).valueOf();
 
             let isCorrectAlice;
-            if(parseInt(alicebal) > 17000000000000000000000) {
+            if(parseInt(bobbal) > 17000000000000000000000) {
                 isCorrectAlice = true;
             } else {
                 isCorrectAlice = false;
@@ -114,7 +113,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
             assert.equal(isCorrectAlice, true);
 
             console.log('pendingChillAlice: ', pendingChillAlice.toString());
-            console.log("Alice: ", alicebal.toString());
+            console.log("Bob: ", bobbal.toString());
             console.log("Dev: ", devbal.toString());
             console.log("Chef: ", chefbal.toString());
             console.log("totalSupply: ", totalSupply.toString());
@@ -297,7 +296,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
             console.log("stakelp: ", stakelp.toString());
 
             // // before 3840 so 20% will deduct as per smart contract
-            await time.advanceBlockTo('4119');
+            await time.advanceBlockTo('4019');
 
             await this.chillchef.withdraw(0, '1000', { from: alice });
             await this.chillchef.getUniReward(this.stakingRewards.address, { from: alice });
@@ -311,14 +310,6 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
             const minterbal = (await this.uni.balanceOf(minter)).valueOf();
             const alicebaluni = (await this.uni.balanceOf(alice)).valueOf();
 
-            let isCorrect;
-            if(parseInt(alicebal) > 110000000000000000000000 && parseInt(chefuni) > 0) {
-                isCorrect = true;
-            } else {
-                isCorrect = false;
-            }
-            assert.equal(isCorrect, true);
-
             console.log("Alice: ", alicebal.toString());
             console.log("Dev: ", devbal.toString());
             console.log("Chef: ", chefbal.toString());
@@ -328,6 +319,14 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
             console.log("ChefUni: ", chefuni.toString());
             console.log("alicebaluni: ", alicebaluni.toString());
             console.log("Minter: ", minterbal.toString());
+
+            let isCorrect;
+            if(parseInt(alicebal) > 110000000000000000000000 && parseInt(chefuni) > 0) {
+                isCorrect = true;
+            } else {
+                isCorrect = false;
+            }
+            assert.equal(isCorrect, true);
         });
 
         it('should deduct reward and add reward before nirvana', async () => {
