@@ -7,7 +7,7 @@ Steps to run smart contracts:
 2). cd yield-backend
 3). yarn 
 3). truffle compile
-4). open another terminal and run 'ganache-cli -l 9000000 -g 20000000000'
+4). open another terminal and run 'ganache-cli -l 9000000 -g 200000000000'
 5). truffle test
 ```
 
@@ -20,7 +20,6 @@ Steps to follow for deploy on mainnet:
 1). Fisrt deploy chilltoken  
 2). Second deploy chillfinance contracts  
 3). Third transfer ownership of chill token to chill finance  
-
 4-i). Forth add Uni pool using `add function`  
 4-ii). if your contract want to stake your lp into uniswap to generate more reward usinh uni token then add pair in uniswap using `addStakeUniPool`
 

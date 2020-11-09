@@ -21,16 +21,19 @@ contract ChillFinance is Ownable {
     }
     
     struct PoolInfo {
-        IERC20 lpToken;           
-        uint256 allocPoint;       
-        uint256 lastRewardBlock;  
+        IERC20 lpToken;
+        uint256 allocPoint;
+        uint256 lastRewardBlock;
         uint256 accChillPerShare;
         uint256 totalPoolBalance;
+        address nirvanaRewardAddress;
+        uint256 nirvanaFee;
     }
 
     ChillToken public chill;
     address public devaddr;
     uint256 public DEV_FEE = 0;
+    uint256 public DEV_TAX_FEE = 20;
     PoolInfo[] public poolInfo;
     uint256 public bonusEndBlock;
     uint256 public constant BONUS_MULTIPLIER = 10;
@@ -43,7 +46,7 @@ contract ChillFinance is Ownable {
     mapping (address => address) public uniRewardAddresses;
     mapping (uint256 => bool) public isCheckInitialPeriod;
     mapping (address => bool) private distributors;
-
+    
     address stablePair;    
     uint256 initialPeriod;
     uint256[] public blockPerPhase;
@@ -55,6 +58,12 @@ contract ChillFinance is Ownable {
     uint256 public phase3time;
     uint256 public phase4time;
     uint256 public phase5time;
+
+    uint256 burnFlag = 0;
+    uint256 lastBurnedPhase1 = 0;
+    uint256 lastBurnedPhase2 = 0;
+    uint256 lastTimeOfBurn;
+    uint256 totalBurnedAmount;
 
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
@@ -89,7 +98,7 @@ contract ChillFinance is Ownable {
         phase3time = block.number.add(426240); // 74 - 44 = 30 days (74*24*60*60)/15
         phase4time = block.number.add(771840); // 134 - 74 = 60 days (134*24*60*60)/15
         phase5time = block.number.add(0); // 134 - 74 = 60 days (134*24*60*60)/15
-
+        lastTimeOfBurn = block.timestamp.add(1 days);
         stableDivider = 1e6;
         ethDivider = 1e18;
     }
@@ -97,6 +106,7 @@ contract ChillFinance is Ownable {
     function poolLength() external view returns (uint256) {
         return poolInfo.length;
     }
+    
     function userPoollength(uint256 _pid) external view returns (uint256) {
         return poolUsers[_pid].length;
     }
@@ -108,14 +118,16 @@ contract ChillFinance is Ownable {
         if (_withUpdate) {
             massUpdatePools();
         }
-        uint256 lastRewardBlock = block.number > startBlockOfChill ? block.number : startBlockOfChill;
+        uint256 _lastRewardBlock = block.number > startBlockOfChill ? block.number : startBlockOfChill;
         totalAllocPoint = totalAllocPoint.add(_allocPoint);
         poolInfo.push(PoolInfo({
             lpToken: _lpToken,
             allocPoint: _allocPoint,
-            lastRewardBlock: lastRewardBlock,
+            lastRewardBlock: _lastRewardBlock,
             accChillPerShare: 0,
-            totalPoolBalance: 0
+            totalPoolBalance: 0,
+            nirvanaRewardAddress: address(0),
+            nirvanaFee: 0
         }));
     }
     
@@ -126,6 +138,12 @@ contract ChillFinance is Ownable {
         }
         totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint);
         poolInfo[_pid].allocPoint = _allocPoint;
+    }
+
+    // nirvana fee and address for specific pool
+    function setNirvanaDetails(uint256 _pid, uint256 _nirvanaFee, address _nirvanaRewardAddress) public onlyOwner {
+        poolInfo[_pid].nirvanaRewardAddress = _nirvanaRewardAddress;
+        poolInfo[_pid].nirvanaFee = _nirvanaFee;
     }
     
     function massUpdatePools() public {
@@ -155,7 +173,7 @@ contract ChillFinance is Ownable {
         
         updatePool(_pid);
         if (user.amount > 0) {
-            userExtraRewardAndTaxes(_pid, pool, user);
+            userRewardAndTaxes(pool, user);
         }
 
         pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
@@ -193,11 +211,11 @@ contract ChillFinance is Ownable {
         }
         
         if (stakingUniPools[address(pool.lpToken)]  && _amount > 0) {
-            withdrawUni(address(pool.lpToken), uniRewardAddresses[address(pool.lpToken)], _amount);
+            withdrawUni(uniRewardAddresses[address(pool.lpToken)], _amount);
         }
 
         updatePool(_pid);
-        userExtraRewardAndTaxes(_pid, pool, user);
+        userRewardAndTaxes(pool, user);
 
         user.amount = user.amount.sub(_amount);
         user.rewardDebt = user.amount.mul(pool.accChillPerShare).div(1e12);
@@ -208,33 +226,13 @@ contract ChillFinance is Ownable {
     }
 
     // withdraw lp token from uniswap uni farm pool  
-    function withdrawUni(address v2address, address _stakeAddress, uint256 _amount) private {
+    function withdrawUni(address _stakeAddress, uint256 _amount) private {
         IUniStakingRewards(_stakeAddress).withdraw(_amount);
     }
     
-    // User's extra reward and taxes will be handle in this internal funation
-    function userExtraRewardAndTaxes(uint256 _pid, PoolInfo storage pool, UserInfo storage user) internal {
-        uint256 pending = user.amount.mul(pool.accChillPerShare).div(1e12).sub(user.rewardDebt);
-        uint256 extraReward = getExtraReward(_pid);
-        uint256 tax = deductTaxByBlock(getCrossMultiplier(user.startedBlock, block.number));
-        uint256 pendingtax;
-        if (tax > 0) {
-            pendingtax = pending.mul(tax).div(100);
-            pending = pending.add(extraReward).sub(pendingtax.div(2));
-        } else {
-            pending = pending.add(extraReward);
-        }
-        safeChillTransfer(msg.sender, pending);
-        if(pendingtax > 0) {
-            safeChillTransfer(devaddr, pendingtax.div(2));
-            chill.burn(msg.sender, pendingtax.div(2));
-        }
-    }
-
     // Reward will genrate in update pool function and call will be happen internally by deposit and withdraw function
     function updatePool(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
-        UserInfo storage user = userInfo[_pid][msg.sender];
 
         if (block.number <= pool.lastRewardBlock) {
             return;
@@ -261,7 +259,7 @@ contract ChillFinance is Ownable {
         
         if (chillReward > 0) {
             if (DEV_FEE > 0) {
-                chill.mint(devaddr, chillReward.div(DEV_FEE));
+                chill.mint(devaddr, chillReward.mul(DEV_FEE).div(100));
             }
             chill.mint(address(this), chillReward);
         }
@@ -269,47 +267,66 @@ contract ChillFinance is Ownable {
         pool.lastRewardBlock = block.number;
     }
     
-    // GetExtraReward will calculate extra reward if you pass certain hours with your deposit token
-    // then you will get extra chill token
-    function getExtraReward(uint256 _pid) public returns(uint256) {
-        PoolInfo storage pool = poolInfo[_pid];
-        UserInfo storage user = userInfo[_pid][msg.sender];
-        if (pool.totalPoolBalance == 0) {
-            return 0;
-        }
-        
-        uint256 multiplier;
-        uint256 chillReward;
-        multiplier = getExtraMultiplier(user.startedBlock, block.number);
-        if (block.number <= phase1time) {
-            chillReward = multiplier.mul(blockPerPhase[0]).mul(pool.allocPoint).div(totalAllocPoint);
-        } else if (block.number <= phase2time) {
-            chillReward = multiplier.mul(blockPerPhase[1]).mul(pool.allocPoint).div(totalAllocPoint);
-        } else if (block.number <= phase3time) {
-            chillReward = multiplier.mul(blockPerPhase[2]).mul(pool.allocPoint).div(totalAllocPoint);
-        } else if (block.number <= phase4time) {
-            chillReward = multiplier.mul(blockPerPhase[3]).mul(pool.allocPoint).div(totalAllocPoint);
+    // User's extra reward and taxes will be handle in this internal funation
+    function userRewardAndTaxes(PoolInfo storage pool, UserInfo storage user) internal {
+        uint256 pending =  user.amount.mul(pool.accChillPerShare).div(1e12).sub(user.rewardDebt);
+        uint256 tax = deductTaxByBlock(getCrossMultiplier(user.startedBlock, block.number));
+        if (tax > 0) {
+            uint256 pendingTax = pending.mul(tax).div(100);
+            uint256 devReward = pendingTax.mul(DEV_TAX_FEE).div(100);
+            safeChillTransfer(devaddr, devReward);
+            if (pool.nirvanaFee > 0) {
+                uint256 nirvanaReward = pendingTax.mul(pool.nirvanaFee).div(100);
+                safeChillTransfer(pool.nirvanaRewardAddress, nirvanaReward);
+                safeChillTransfer(msg.sender, pending.sub(devReward).sub(nirvanaReward));
+                chill.burn(msg.sender, pendingTax.sub(devReward).sub(nirvanaReward));
+                lastDayBurned(pendingTax.sub(devReward).sub(nirvanaReward));
+            } else {
+                safeChillTransfer(msg.sender, pending.sub(devReward));
+                chill.burn(msg.sender, pendingTax.sub(devReward));
+                lastDayBurned(pendingTax.sub(devReward));
+            }
         } else {
-            chillReward = multiplier.mul(blockPerPhase[4]).mul(pool.allocPoint).div(totalAllocPoint);
+            safeChillTransfer(msg.sender, pending);
+            lastDayBurned(0);
         }
-        
-        if (chillReward > 0) {
-            chill.mint(address(this), chillReward);
-        }
-        return chillReward;
     }
     
+    function lastDayBurned(uint256 burnedAmount) internal {
+        if (block.timestamp >= lastTimeOfBurn) {
+            if (burnFlag == 0) {
+                burnFlag = 1;
+                lastBurnedPhase1 = 0;
+            } else {
+                burnFlag = 0;
+                lastBurnedPhase2 = 0;
+            }
+            lastTimeOfBurn = block.timestamp.add(1 days);
+        }
+        totalBurnedAmount = totalBurnedAmount.add(burnedAmount);
+        if (burnFlag == 0) {
+            lastBurnedPhase2 = lastBurnedPhase2.add(burnedAmount);
+            // return lastBurnedPhase1;
+        } else {
+            lastBurnedPhase1 = lastBurnedPhase1.add(burnedAmount);
+            // return lastBurnedPhase2;
+        }
+    }
+    
+    function getBurnedDetails() public view returns (uint256, uint256, uint256, uint256) {
+        return (burnFlag, lastBurnedPhase1, lastBurnedPhase2, totalBurnedAmount);
+    }
+
     // For user interface to claimable token
     function pendingChill(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
+        uint256 pending;
         uint256 accChillPerShare = pool.accChillPerShare;
-        if (pool.totalPoolBalance != 0) {
-            uint256 extraMultiplier;
+        uint256 lpSupply = pool.totalPoolBalance;
+        if (lpSupply != 0) {
             uint256 chillReward;
             uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-            extraMultiplier = getExtraMultiplier(user.startedBlock, block.number);
-            multiplier = multiplier.add(extraMultiplier);
             if (block.number <= phase1time) {
                 chillReward = multiplier.mul(blockPerPhase[0]).mul(pool.allocPoint).div(totalAllocPoint);
             } else if (block.number <= phase2time) {
@@ -321,12 +338,15 @@ contract ChillFinance is Ownable {
             } else {
                 chillReward = multiplier.mul(blockPerPhase[4]).mul(pool.allocPoint).div(totalAllocPoint);
             }
-            uint256 tax = deductTaxByBlock(getCrossMultiplier(user.startedBlock, block.number));
-            uint256 pendingtax = chillReward.mul(tax).div(100);
-            chillReward = chillReward.sub(pendingtax);
             accChillPerShare = accChillPerShare.add(chillReward.mul(1e12).div(pool.totalPoolBalance));
+            pending =  user.amount.mul(accChillPerShare).div(1e12).sub(user.rewardDebt);
+            uint256 tax = deductTaxByBlock(getCrossMultiplier(user.startedBlock, block.number));
+            if (tax > 0) {
+                uint256 pendingTax = pending.mul(tax).div(100);
+                pending = pending.sub(pendingTax);
+            }
         }
-        return user.amount.mul(accChillPerShare).div(1e12).sub(user.rewardDebt);
+        return pending;
     }
 
     // Return reward multiplier over the given _from to _to block.
@@ -351,13 +371,6 @@ contract ChillFinance is Ownable {
             multiplier = _from.sub(currentblock);
         }
         return multiplier;
-    }
-    
-    // Return extra reward multiplier over the given _from to _to block.
-    function getExtraMultiplier(uint256 _from, uint256 currentblock) public view returns (uint256) {
-        uint256 multiplier = getCrossMultiplier(_from, currentblock);
-        uint256 extraMultiplier = multiplier.mul(getTotalBlocksCovered(multiplier)).div(100);
-        return extraMultiplier;
     }
     
     // get if nirvana
@@ -386,13 +399,17 @@ contract ChillFinance is Ownable {
     
     // Deduct tax if user withdraw before nirvana at different stage
     function deductTaxByBlock(uint256 _block) internal pure returns(uint256) {
-        if (_block <= 3840) {
-            return 20;
+        if (_block <= 1920) {
+            return 50;
+        } else if (_block <= 3840) {
+            return 40;
+        } else if (_block <= 5760) {
+            return 30;
         } else if (_block <= 7680) {
-            return 15;
+            return 20;
         } else if (_block <= 9600) {
             return 10;
-        } else if (_block > 9600) {
+        }  else {
             return 0;
         }
     }
@@ -417,8 +434,7 @@ contract ChillFinance is Ownable {
                 tokenbalance = _liquiditybalance.mul(countReserves1).div(countTotalSupply);
                 ethAmount = UniswapV2Library.getAmountOut(tokenbalance, countReserves1, countReserves0);
             }
-        }
-        else {
+        } else {
             return 0;
         }
         return countUsdtAmount(ethAmount, _stablePair);
@@ -490,10 +506,11 @@ contract ChillFinance is Ownable {
     }
     
     // dev adderess can only change by dev
-    function dev(address _devaddr, uint256 _devFee) public {
+    function dev(address _devaddr, uint256 _devFee, uint256 _devTaxFee) public {
         require(msg.sender == devaddr, "dev adddress is not valid");
         devaddr = _devaddr;
         DEV_FEE = _devFee;
+        DEV_TAX_FEE = _devTaxFee;
     }
 
     // to set flag for count $20000 worth asset for specific pool
@@ -586,3 +603,4 @@ contract ChillFinance is Ownable {
         distributors[_distributor] = _isdistributor;
     }
 }
+ 
