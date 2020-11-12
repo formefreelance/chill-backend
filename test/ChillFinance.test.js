@@ -89,35 +89,35 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
             await this.chillchef.deposit('0', '100', { from: alice });
             await time.advanceBlockTo('600');
             const pendingChillAlice = await this.chillchef.pendingChill('0', alice, { from: alice });
-            await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 amount
-            const burnDetails = await this.chillchef.getBurnedDetails();
-            console.log('burnDetails: ', burnDetails[0].toString());
-            console.log('burnDetails: ', burnDetails[1].toString());
-            console.log('burnDetails: ', burnDetails[2].toString());
-            console.log('burnDetails: ', burnDetails[3].toString());
-            await time.advanceBlockTo('1300');
-            await time.increaseTo('1604978963');
-            await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
-            const burnDetails2 = await this.chillchef.getBurnedDetails();
-            console.log('burnDetails: ', burnDetails2[0].toString());
-            console.log('burnDetails: ', burnDetails2[1].toString());
-            console.log('burnDetails: ', burnDetails2[2].toString());
-            console.log('burnDetails: ', burnDetails2[3].toString());
-            await time.advanceBlockTo('1800');
-            await time.increaseTo('1605065963');
-            await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
-            const burnDetails3 = await this.chillchef.getBurnedDetails();
-            console.log('burnDetails: ', burnDetails3[0].toString());
-            console.log('burnDetails: ', burnDetails3[1].toString());
-            console.log('burnDetails: ', burnDetails3[2].toString());
-            console.log('burnDetails: ', burnDetails3[3].toString());
-            await time.increaseTo('1605152963');
-            await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
-            const burnDetails4 = await this.chillchef.getBurnedDetails();
-            console.log('burnDetails: ', burnDetails4[0].toString());
-            console.log('burnDetails: ', burnDetails4[1].toString());
-            console.log('burnDetails: ', burnDetails4[2].toString());
-            console.log('burnDetails: ', burnDetails4[3].toString());
+            // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 amount
+            // const burnDetails = await this.chillchef.getBurnedDetails();
+            // console.log('burnDetails: ', burnDetails[0].toString());
+            // console.log('burnDetails: ', burnDetails[1].toString());
+            // console.log('burnDetails: ', burnDetails[2].toString());
+            // console.log('burnDetails: ', burnDetails[3].toString());
+            // await time.advanceBlockTo('1300');
+            // await time.increaseTo('1604978963');
+            // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
+            // const burnDetails2 = await this.chillchef.getBurnedDetails();
+            // console.log('burnDetails: ', burnDetails2[0].toString());
+            // console.log('burnDetails: ', burnDetails2[1].toString());
+            // console.log('burnDetails: ', burnDetails2[2].toString());
+            // console.log('burnDetails: ', burnDetails2[3].toString());
+            // await time.advanceBlockTo('1800');
+            // await time.increaseTo('1605065963');
+            // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
+            // const burnDetails3 = await this.chillchef.getBurnedDetails();
+            // console.log('burnDetails: ', burnDetails3[0].toString());
+            // console.log('burnDetails: ', burnDetails3[1].toString());
+            // console.log('burnDetails: ', burnDetails3[2].toString());
+            // console.log('burnDetails: ', burnDetails3[3].toString());
+            // await time.increaseTo('1605152963');
+            // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
+            // const burnDetails4 = await this.chillchef.getBurnedDetails();
+            // console.log('burnDetails: ', burnDetails4[0].toString());
+            // console.log('burnDetails: ', burnDetails4[1].toString());
+            // console.log('burnDetails: ', burnDetails4[2].toString());
+            // console.log('burnDetails: ', burnDetails4[3].toString());
             const alicebal = (await this.chill.balanceOf(alice)).valueOf();
             const minterbal = (await this.chill.balanceOf(minter)).valueOf();
             const devbal = (await this.chill.balanceOf(dev)).valueOf();

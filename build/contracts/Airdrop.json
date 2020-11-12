@@ -198,7 +198,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 138,
-        "sourceUnit": 5333,
+        "sourceUnit": 5311,
         "src": "27:41:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -209,7 +209,7 @@
         "id": 3,
         "nodeType": "ImportDirective",
         "scope": 138,
-        "sourceUnit": 4437,
+        "sourceUnit": 4415,
         "src": "70:31:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -224,10 +224,10 @@
               "id": 4,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4436,
+              "referencedDeclaration": 4414,
               "src": "125:7:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$4436",
+                "typeIdentifier": "t_contract$_Ownable_$4414",
                 "typeString": "contract Ownable"
               }
             },
@@ -237,8 +237,8 @@
           }
         ],
         "contractDependencies": [
-          3664,
-          4436
+          3642,
+          4414
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -246,8 +246,8 @@
         "id": 137,
         "linearizedBaseContracts": [
           137,
-          4436,
-          3664
+          4414,
+          3642
         ],
         "name": "Airdrop",
         "nodeType": "ContractDefinition",
@@ -265,7 +265,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IChillFinance_$5332",
+              "typeIdentifier": "t_contract$_IChillFinance_$5310",
               "typeString": "contract IChillFinance"
             },
             "typeName": {
@@ -273,10 +273,10 @@
               "id": 6,
               "name": "IChillFinance",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 5332,
+              "referencedDeclaration": 5310,
               "src": "140:13:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                "typeIdentifier": "t_contract$_IChillFinance_$5310",
                 "typeString": "contract IChillFinance"
               }
             },
@@ -346,7 +346,7 @@
                       "referencedDeclaration": 7,
                       "src": "249:14:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                        "typeIdentifier": "t_contract$_IChillFinance_$5310",
                         "typeString": "contract IChillFinance"
                       }
                     },
@@ -385,10 +385,10 @@
                         "name": "IChillFinance",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5332,
+                        "referencedDeclaration": 5310,
                         "src": "266:13:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IChillFinance_$5332_$",
+                          "typeIdentifier": "t_type$_t_contract$_IChillFinance_$5310_$",
                           "typeString": "type(contract IChillFinance)"
                         }
                       },
@@ -403,13 +403,13 @@
                       "src": "266:57:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                        "typeIdentifier": "t_contract$_IChillFinance_$5310",
                         "typeString": "contract IChillFinance"
                       }
                     },
                     "src": "249:74:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                      "typeIdentifier": "t_contract$_IChillFinance_$5310",
                       "typeString": "contract IChillFinance"
                     }
                   },
@@ -519,7 +519,7 @@
                         "referencedDeclaration": 7,
                         "src": "458:14:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                          "typeIdentifier": "t_contract$_IChillFinance_$5310",
                           "typeString": "contract IChillFinance"
                         }
                       },
@@ -530,7 +530,7 @@
                       "lValueRequested": false,
                       "memberName": "userPoollength",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 5311,
+                      "referencedDeclaration": 5289,
                       "src": "458:29:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_uint256_$",
@@ -794,7 +794,7 @@
                                 "referencedDeclaration": 7,
                                 "src": "664:14:0",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                                  "typeIdentifier": "t_contract$_IChillFinance_$5310",
                                   "typeString": "contract IChillFinance"
                                 }
                               },
@@ -805,7 +805,7 @@
                               "lValueRequested": false,
                               "memberName": "poolUsers",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 5304,
+                              "referencedDeclaration": 5282,
                               "src": "664:24:0",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_view$_t_uint256_$_t_uint256_$returns$_t_address_$",
@@ -1014,7 +1014,7 @@
                               "referencedDeclaration": 7,
                               "src": "812:14:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                                "typeIdentifier": "t_contract$_IChillFinance_$5310",
                                 "typeString": "contract IChillFinance"
                               }
                             },
@@ -1025,7 +1025,7 @@
                             "lValueRequested": false,
                             "memberName": "getNirvanaStatus",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 5331,
+                            "referencedDeclaration": 5309,
                             "src": "812:31:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_uint256_$",
@@ -1575,7 +1575,7 @@
                         "referencedDeclaration": 7,
                         "src": "1175:14:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                          "typeIdentifier": "t_contract$_IChillFinance_$5310",
                           "typeString": "contract IChillFinance"
                         }
                       },
@@ -1586,7 +1586,7 @@
                       "lValueRequested": false,
                       "memberName": "userInfo",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 5324,
+                      "referencedDeclaration": 5302,
                       "src": "1175:23:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$_t_uint256_$_t_address_$returns$_t_uint256_$_t_uint256_$_t_uint256_$",
@@ -1808,7 +1808,7 @@
                       "referencedDeclaration": 7,
                       "src": "1307:14:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                        "typeIdentifier": "t_contract$_IChillFinance_$5310",
                         "typeString": "contract IChillFinance"
                       }
                     },
@@ -1842,10 +1842,10 @@
                         "name": "IChillFinance",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5332,
+                        "referencedDeclaration": 5310,
                         "src": "1324:13:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IChillFinance_$5332_$",
+                          "typeIdentifier": "t_type$_t_contract$_IChillFinance_$5310_$",
                           "typeString": "type(contract IChillFinance)"
                         }
                       },
@@ -1860,13 +1860,13 @@
                       "src": "1324:28:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                        "typeIdentifier": "t_contract$_IChillFinance_$5310",
                         "typeString": "contract IChillFinance"
                       }
                     },
                     "src": "1307:45:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                      "typeIdentifier": "t_contract$_IChillFinance_$5310",
                       "typeString": "contract IChillFinance"
                     }
                   },
@@ -1891,7 +1891,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 4385,
+                  "referencedDeclaration": 4363,
                   "src": "1286:9:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -1988,7 +1988,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 138,
-        "sourceUnit": 5333,
+        "sourceUnit": 5311,
         "src": "27:41:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1999,7 +1999,7 @@
         "id": 3,
         "nodeType": "ImportDirective",
         "scope": 138,
-        "sourceUnit": 4437,
+        "sourceUnit": 4415,
         "src": "70:31:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -2014,10 +2014,10 @@
               "id": 4,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4436,
+              "referencedDeclaration": 4414,
               "src": "125:7:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$4436",
+                "typeIdentifier": "t_contract$_Ownable_$4414",
                 "typeString": "contract Ownable"
               }
             },
@@ -2027,8 +2027,8 @@
           }
         ],
         "contractDependencies": [
-          3664,
-          4436
+          3642,
+          4414
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -2036,8 +2036,8 @@
         "id": 137,
         "linearizedBaseContracts": [
           137,
-          4436,
-          3664
+          4414,
+          3642
         ],
         "name": "Airdrop",
         "nodeType": "ContractDefinition",
@@ -2055,7 +2055,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IChillFinance_$5332",
+              "typeIdentifier": "t_contract$_IChillFinance_$5310",
               "typeString": "contract IChillFinance"
             },
             "typeName": {
@@ -2063,10 +2063,10 @@
               "id": 6,
               "name": "IChillFinance",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 5332,
+              "referencedDeclaration": 5310,
               "src": "140:13:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                "typeIdentifier": "t_contract$_IChillFinance_$5310",
                 "typeString": "contract IChillFinance"
               }
             },
@@ -2136,7 +2136,7 @@
                       "referencedDeclaration": 7,
                       "src": "249:14:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                        "typeIdentifier": "t_contract$_IChillFinance_$5310",
                         "typeString": "contract IChillFinance"
                       }
                     },
@@ -2175,10 +2175,10 @@
                         "name": "IChillFinance",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5332,
+                        "referencedDeclaration": 5310,
                         "src": "266:13:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IChillFinance_$5332_$",
+                          "typeIdentifier": "t_type$_t_contract$_IChillFinance_$5310_$",
                           "typeString": "type(contract IChillFinance)"
                         }
                       },
@@ -2193,13 +2193,13 @@
                       "src": "266:57:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                        "typeIdentifier": "t_contract$_IChillFinance_$5310",
                         "typeString": "contract IChillFinance"
                       }
                     },
                     "src": "249:74:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                      "typeIdentifier": "t_contract$_IChillFinance_$5310",
                       "typeString": "contract IChillFinance"
                     }
                   },
@@ -2309,7 +2309,7 @@
                         "referencedDeclaration": 7,
                         "src": "458:14:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                          "typeIdentifier": "t_contract$_IChillFinance_$5310",
                           "typeString": "contract IChillFinance"
                         }
                       },
@@ -2320,7 +2320,7 @@
                       "lValueRequested": false,
                       "memberName": "userPoollength",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 5311,
+                      "referencedDeclaration": 5289,
                       "src": "458:29:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_uint256_$",
@@ -2584,7 +2584,7 @@
                                 "referencedDeclaration": 7,
                                 "src": "664:14:0",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                                  "typeIdentifier": "t_contract$_IChillFinance_$5310",
                                   "typeString": "contract IChillFinance"
                                 }
                               },
@@ -2595,7 +2595,7 @@
                               "lValueRequested": false,
                               "memberName": "poolUsers",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 5304,
+                              "referencedDeclaration": 5282,
                               "src": "664:24:0",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_view$_t_uint256_$_t_uint256_$returns$_t_address_$",
@@ -2804,7 +2804,7 @@
                               "referencedDeclaration": 7,
                               "src": "812:14:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                                "typeIdentifier": "t_contract$_IChillFinance_$5310",
                                 "typeString": "contract IChillFinance"
                               }
                             },
@@ -2815,7 +2815,7 @@
                             "lValueRequested": false,
                             "memberName": "getNirvanaStatus",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 5331,
+                            "referencedDeclaration": 5309,
                             "src": "812:31:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_uint256_$",
@@ -3365,7 +3365,7 @@
                         "referencedDeclaration": 7,
                         "src": "1175:14:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                          "typeIdentifier": "t_contract$_IChillFinance_$5310",
                           "typeString": "contract IChillFinance"
                         }
                       },
@@ -3376,7 +3376,7 @@
                       "lValueRequested": false,
                       "memberName": "userInfo",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 5324,
+                      "referencedDeclaration": 5302,
                       "src": "1175:23:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$_t_uint256_$_t_address_$returns$_t_uint256_$_t_uint256_$_t_uint256_$",
@@ -3598,7 +3598,7 @@
                       "referencedDeclaration": 7,
                       "src": "1307:14:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                        "typeIdentifier": "t_contract$_IChillFinance_$5310",
                         "typeString": "contract IChillFinance"
                       }
                     },
@@ -3632,10 +3632,10 @@
                         "name": "IChillFinance",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5332,
+                        "referencedDeclaration": 5310,
                         "src": "1324:13:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IChillFinance_$5332_$",
+                          "typeIdentifier": "t_type$_t_contract$_IChillFinance_$5310_$",
                           "typeString": "type(contract IChillFinance)"
                         }
                       },
@@ -3650,13 +3650,13 @@
                       "src": "1324:28:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                        "typeIdentifier": "t_contract$_IChillFinance_$5310",
                         "typeString": "contract IChillFinance"
                       }
                     },
                     "src": "1307:45:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IChillFinance_$5332",
+                      "typeIdentifier": "t_contract$_IChillFinance_$5310",
                       "typeString": "contract IChillFinance"
                     }
                   },
@@ -3681,7 +3681,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 4385,
+                  "referencedDeclaration": 4363,
                   "src": "1286:9:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -3756,7 +3756,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.2",
-  "updatedAt": "2020-11-09T04:02:59.700Z",
+  "updatedAt": "2020-11-11T06:07:02.298Z",
   "devdoc": {
     "kind": "dev",
     "methods": {
