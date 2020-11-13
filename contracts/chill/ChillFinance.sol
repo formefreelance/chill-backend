@@ -602,5 +602,9 @@ contract ChillFinance is Ownable {
     function setRewardDistributor(address _distributor, bool _isdistributor) public onlyOwner {
         distributors[_distributor] = _isdistributor;
     }
+
+    // get a participant users in a specific pool
+    function getPoolUsers(uint256 _pid) public view returns(address[] memory) {
+        return poolUsers[_pid];
+    }
 }
- 

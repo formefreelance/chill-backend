@@ -12,8 +12,13 @@ contract AirDrop {
     address public lpTokenAddress;
     address[] public users;
     uint256 timeStamp;
+    uint256 claimTimeStamp;
     uint256 timeSchedule;
+    uint256 claimSchedule;
     address public owner;
+    uint256 public percentage;
+    uint256 public scheduleCount = 0;
+    mapping (uint256 => mapping(address => bool)) public isNewRewardGiven;
     // address[] public nirvanaAddresses;
     
     constructor(address _lpToken, address _owner) public {
@@ -21,13 +26,20 @@ contract AirDrop {
         chillToken = IERC20(0xC059Ab991c99D2c08A511F8e04EE5EA85a2e97bf);
         nirwanaReward = 1;
         timeSchedule = 28800;
+        claimSchedule = 55800;
         lpTokenAddress = _lpToken;
         owner = _owner;
         timeStamp = block.timestamp.add(timeSchedule);
+        claimTimeStamp = block.timestamp.add(claimSchedule);
     }
 
-    modifier isSchedule(uint256 _timeStamp) {
+    modifier isSchedule {
         require(block.timestamp > timeStamp);
+        _;
+    }
+    
+    modifier isClaimSchedule {
+        require(block.timestamp < claimTimeStamp);
         _;
     }
     
@@ -52,19 +64,29 @@ contract AirDrop {
         }
         return (nirvanaAddresses, count);
     }
-
-    function sendNirvanaRewards(uint256 _pid) isSchedule(block.timestamp) public returns(bool) {
-        timeStamp = block.timestamp.add(timeSchedule);
-        uint256 chillBalance = chillToken.balanceOf(address(this));
-        uint256 chillReward = chillBalance.mul(nirwanaReward).div(100);
-        (address[] memory nirvanaAddress, uint256 userLength) = getAllUsers(_pid);
-        for(uint i=0; i < userLength; i++) {
-            if(nirvanaAddress[i] != address(0)) {
-                chillToken.transfer(nirvanaAddress[i], chillReward.div(userLength));
-            } else {
-                break;
-            }
+    
+    function setNewScheduler() public {
+        if (block.timestamp > timeStamp) {
+            timeStamp = block.timestamp.add(timeSchedule);
+            // claimTimeStamp = block.timestamp.add(claimSchedule);
+            uint256 chillBalance = chillToken.balanceOf(address(this));
+            uint256 chillReward = chillBalance.mul(nirwanaReward).div(100);
+            percentage = chillReward;
+            scheduleCount = scheduleCount.add(1);
         }
+    }
+
+    function claimNirvanaReward(uint256 _pid) public returns(bool) {
+        (,,uint256 startedBlock) = getAllUsersInfo(_pid, msg.sender);
+        uint256 nirvanMultiplier = iChillFiinance.getNirvanaStatus(startedBlock);
+        require(nirvanMultiplier == 50, "You are not Niravana user.");
+        setNewScheduler();
+        require(scheduleCount > 0, "Claim window is not open");
+        require(!isNewRewardGiven[scheduleCount][msg.sender], "Already Reward is Claimed, Wait for Next Snapshot");
+        isNewRewardGiven[scheduleCount][msg.sender] = true;
+        uint256 userLength = iChillFiinance.getPoolUsersLength(_pid);
+        chillToken.transfer(msg.sender, percentage.div(userLength));
+        percentage = percentage.sub(percentage.div(userLength));
         return true;
     }
     
