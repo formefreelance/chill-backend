@@ -607,4 +607,9 @@ contract ChillFinance is Ownable {
     function getPoolUsers(uint256 _pid) public view returns(address[] memory) {
         return poolUsers[_pid];
     }
+    
+    // get a participant users in a specific pool
+    function getPoolUsersLength(uint256 _pid) public view returns(uint256) {
+        return poolUsers[_pid].length;
+    }
 }

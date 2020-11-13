@@ -19,7 +19,6 @@ contract AirDrop {
     uint256 public percentage;
     uint256 public scheduleCount = 0;
     mapping (uint256 => mapping(address => bool)) public isNewRewardGiven;
-    // address[] public nirvanaAddresses;
     
     constructor(address _lpToken, address _owner) public {
         iChillFiinance = IChillFinance(0xa15E697806711003E635bEe08CA049130C4917fd);
@@ -55,7 +54,7 @@ contract AirDrop {
         uint256 count = 0;
         for(uint i=0; i < userLength; i++) {
             poolUser = iChillFiinance.poolUsers(_pid, i);
-            (,,uint256 startedBlock) = getAllUsersInfo(_pid, poolUser);
+            (,,uint256 startedBlock) = getUsersInfo(_pid, poolUser);
             uint256 nirvanMultiplier = iChillFiinance.getNirvanaStatus(startedBlock);
             if(nirvanMultiplier == 50) {
                 nirvanaAddresses[count] = poolUser;
@@ -68,7 +67,6 @@ contract AirDrop {
     function setNewScheduler() public {
         if (block.timestamp > timeStamp) {
             timeStamp = block.timestamp.add(timeSchedule);
-            // claimTimeStamp = block.timestamp.add(claimSchedule);
             uint256 chillBalance = chillToken.balanceOf(address(this));
             uint256 chillReward = chillBalance.mul(nirwanaReward).div(100);
             percentage = chillReward;
@@ -77,16 +75,18 @@ contract AirDrop {
     }
 
     function claimNirvanaReward(uint256 _pid) public returns(bool) {
-        (,,uint256 startedBlock) = getAllUsersInfo(_pid, msg.sender);
+        (,,uint256 startedBlock) = getUsersInfo(_pid, msg.sender);
         uint256 nirvanMultiplier = iChillFiinance.getNirvanaStatus(startedBlock);
         require(nirvanMultiplier == 50, "You are not Niravana user.");
         setNewScheduler();
         require(scheduleCount > 0, "Claim window is not open");
         require(!isNewRewardGiven[scheduleCount][msg.sender], "Already Reward is Claimed, Wait for Next Snapshot");
         isNewRewardGiven[scheduleCount][msg.sender] = true;
-        uint256 userLength = iChillFiinance.getPoolUsersLength(_pid);
-        chillToken.transfer(msg.sender, percentage.div(userLength));
-        percentage = percentage.sub(percentage.div(userLength));
+        (,,,,uint256 poolBalance,,) = getPoolInfo(_pid);
+        (uint256 userBalance,,) = getUsersInfo(_pid, msg.sender);
+        uint256 transferBalancePercent = userBalance.div(poolBalance).mul(100);
+        uint256 transferBalance = transferBalancePercent.mul(percentage).div(100);
+        chillToken.transfer(msg.sender, transferBalance);
         return true;
     }
     
@@ -98,8 +98,12 @@ contract AirDrop {
         timeSchedule = _timeSchedule;
     }
 
-    function getAllUsersInfo(uint256 _pid, address _user) public view returns (uint256, uint256, uint256) {
+    function getUsersInfo(uint256 _pid, address _user) public view returns (uint256, uint256, uint256) {
         return iChillFiinance.userInfo(_pid, _user);
+    }
+    
+    function getPoolInfo(uint256 _pid) public view returns (IERC20, uint256, uint256, uint256, uint256, address, uint256) {
+        return iChillFiinance.poolInfo(_pid);
     }
     
     function setChillFinance(address _chillFinance) public isOwner {
