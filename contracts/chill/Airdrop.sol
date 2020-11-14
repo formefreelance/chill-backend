@@ -35,6 +35,15 @@ contract AirDrop {
         claimTimeStamp = currentTimeStamp.add(timeSchedule).add(claimSchedule);
     }
     
+    function startPool(uint256 _timeSchedule, uint256 _claimSchedule, uint256 _nirvanaReward) public isOwner {
+        nirwanaReward = _nirvanaReward; // Nirvana Reward Percentage
+        timeSchedule = _timeSchedule; // 8 hours
+        claimSchedule = _claimSchedule; // 15 hours 30 mins
+        uint256 currentTimeStamp = getCurrentTimeStamp();
+        timeStamp = currentTimeStamp.add(timeSchedule);
+        claimTimeStamp = currentTimeStamp.add(timeSchedule).add(claimSchedule);
+    }
+    
     modifier isOwner {
         require(owner == msg.sender, "Error: Address is not owner");
         _;
@@ -62,7 +71,7 @@ contract AirDrop {
         isNewRewardGiven[scheduleCount][msg.sender] = true;
         (,,,,uint256 poolBalance,,) = getPoolInfo(_pid);
         (uint256 userBalance,,) = getUsersInfo(_pid, msg.sender);
-        uint256 transferBalancePercent = userBalance.div(poolBalance).mul(100);
+        uint256 transferBalancePercent = userBalance.mul(100).div(poolBalance);
         uint256 transferBalance = transferBalancePercent.mul(rewardAmount).div(100);
         chillToken.transfer(msg.sender, transferBalance);
         return true;
@@ -88,11 +97,11 @@ contract AirDrop {
     function setNirvanaReward(uint256 _rewards) public isOwner {
         nirwanaReward = _rewards;
     }
-
+    
     function setTimeSchedule(uint256 _timeSchedule) public isOwner {
         timeSchedule = _timeSchedule;
     }
-
+    
     function setClaimTimeSchedule(uint256 _claimSchedule) public isOwner {
         claimSchedule = _claimSchedule;
     }
@@ -100,7 +109,7 @@ contract AirDrop {
     function setNirVanaMultiplier(uint256 _nirvanaMultiplier) public isOwner {
         NIRVANA_MULTIPLIER = _nirvanaMultiplier;
     }
-
+    
     function getUsersInfo(uint256 _pid, address _user) public view returns (uint256, uint256, uint256) {
         return iChillFiinance.userInfo(_pid, _user);
     }
