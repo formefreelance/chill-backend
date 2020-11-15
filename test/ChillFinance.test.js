@@ -17,14 +17,6 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         this.weth = await WETH9.new({ from: alice });
         this.router = await UniswapV2Router01.new(this.factory.address, this.weth.address, { from: alice });
         this.chill = await ChillToken.new(this.router.address, this.factory.address, this.weth.address, { from: alice });
-
-        // this.chill = await ChillToken.new({ from: alice });
-        // await this.chill.createPair(this.chill.address, this.weth.address, { from: alice });
-        // const pair = await this.factory.getPair(this.chill.address, this.weth.address);
-        // console.log('pair: ', pair);
-        // await this.chill.mint(this.chill.address, "1000000000000000000000000", { from: alice });
-        // await this.chill.addLiquidity(this.chill.address, this.weth.address, web3.utils.toWei('2', 'ether'), web3.utils.toWei('1', 'ether'), "0", "0", alice, 1603769936, { from: alice, ablue: web3.utils.toWei('1', 'ether') });
-
         this.uni = await UniToken.new({ from: alice });
         this.uniV2Pair = await UniswapV2Pair.new({ from: alice });
     });
@@ -38,14 +30,6 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         assert.equal(chill.valueOf(), this.chill.address);
         assert.equal(devaddr.valueOf(), dev);
         assert.equal(owner.valueOf(), this.chillchef.address);
-
-        // await this.chillchef.setCheckInitialPeriod(true, {from:alice});
-        // const checkInitialPeriod = await this.chillchef.getCheckInitialPeriod({from:alice});
-        // console.log(checkInitialPeriod);
-
-        // await this.chillchef.setCheckInitialPeriod(false, {from:alice});
-        // const checkInitialPeriod2 = await this.chillchef.getCheckInitialPeriod({from:alice});
-        // console.log(checkInitialPeriod2);
     });
 
     it('should allow dev and only dev to update dev', async () => {
@@ -79,64 +63,64 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
             await this.uni.mint(this.stakingRewards2.address, '1000000000000000000000', {from: alice});
         });
 
-        it('should allow deposit on one lp one depositer', async () => {
-            this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address,{ from: alice });
-            await this.chill.transferOwnership(this.chillchef.address, { from: alice });
-            await this.chillchef.add('100', this.lp.address, true);
-            await this.chillchef.setNirvanaDetails('0', '10', minter);
-            await time.advanceBlockTo('400');
-            await this.lp.approve(this.chillchef.address, '100000000000000000000000', { from: alice });
-            await this.chillchef.deposit('0', '100', { from: alice });
-            await time.advanceBlockTo('600');
-            const pendingChillAlice = await this.chillchef.pendingChill('0', alice, { from: alice });
-            // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 amount
-            // const burnDetails = await this.chillchef.getBurnedDetails();
-            // console.log('burnDetails: ', burnDetails[0].toString());
-            // console.log('burnDetails: ', burnDetails[1].toString());
-            // console.log('burnDetails: ', burnDetails[2].toString());
-            // console.log('burnDetails: ', burnDetails[3].toString());
-            // await time.advanceBlockTo('1300');
-            // await time.increaseTo('1604978963');
-            // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
-            // const burnDetails2 = await this.chillchef.getBurnedDetails();
-            // console.log('burnDetails: ', burnDetails2[0].toString());
-            // console.log('burnDetails: ', burnDetails2[1].toString());
-            // console.log('burnDetails: ', burnDetails2[2].toString());
-            // console.log('burnDetails: ', burnDetails2[3].toString());
-            // await time.advanceBlockTo('1800');
-            // await time.increaseTo('1605065963');
-            // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
-            // const burnDetails3 = await this.chillchef.getBurnedDetails();
-            // console.log('burnDetails: ', burnDetails3[0].toString());
-            // console.log('burnDetails: ', burnDetails3[1].toString());
-            // console.log('burnDetails: ', burnDetails3[2].toString());
-            // console.log('burnDetails: ', burnDetails3[3].toString());
-            // await time.increaseTo('1605152963');
-            // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
-            // const burnDetails4 = await this.chillchef.getBurnedDetails();
-            // console.log('burnDetails: ', burnDetails4[0].toString());
-            // console.log('burnDetails: ', burnDetails4[1].toString());
-            // console.log('burnDetails: ', burnDetails4[2].toString());
-            // console.log('burnDetails: ', burnDetails4[3].toString());
-            const alicebal = (await this.chill.balanceOf(alice)).valueOf();
-            const minterbal = (await this.chill.balanceOf(minter)).valueOf();
-            const devbal = (await this.chill.balanceOf(dev)).valueOf();
-            const chefbal = (await this.chill.balanceOf(this.chillchef.address)).valueOf();
-            const totalSupply = (await this.chill.totalSupply()).valueOf();
-            let isCorrectAlice;
-            if(parseInt(alicebal) > 7400000000000000000000) {
-                isCorrectAlice = true;
-            } else {
-                isCorrectAlice = false;
-            }
-            assert.equal(isCorrectAlice, true);
-            console.log('pendingChillAlice: ', pendingChillAlice.toString());
-            console.log("Alice: ", alicebal.toString());
-            console.log("Minter Nirvana-Rewarder: ", minterbal.toString());
-            console.log("Dev: ", devbal.toString());
-            console.log("Chef: ", chefbal.toString());
-            console.log("totalSupply: ", totalSupply.toString());
-        });
+        // it('should allow deposit on one lp one depositer', async () => {
+        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address,{ from: alice });
+        //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
+        //     await this.chillchef.add('100', this.lp.address, true);
+        //     await this.chillchef.setNirvanaDetails('0', '10', minter);
+        //     await time.advanceBlockTo('400');
+        //     await this.lp.approve(this.chillchef.address, '100000000000000000000000', { from: alice });
+        //     await this.chillchef.deposit('0', '100', { from: alice });
+        //     await time.advanceBlockTo('600');
+        //     const pendingChillAlice = await this.chillchef.pendingChill('0', alice, { from: alice });
+        //     // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 amount
+        //     // const burnDetails = await this.chillchef.getBurnedDetails();
+        //     // console.log('burnDetails: ', burnDetails[0].toString());
+        //     // console.log('burnDetails: ', burnDetails[1].toString());
+        //     // console.log('burnDetails: ', burnDetails[2].toString());
+        //     // console.log('burnDetails: ', burnDetails[3].toString());
+        //     // await time.advanceBlockTo('1300');
+        //     // await time.increaseTo('1604978963');
+        //     // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
+        //     // const burnDetails2 = await this.chillchef.getBurnedDetails();
+        //     // console.log('burnDetails: ', burnDetails2[0].toString());
+        //     // console.log('burnDetails: ', burnDetails2[1].toString());
+        //     // console.log('burnDetails: ', burnDetails2[2].toString());
+        //     // console.log('burnDetails: ', burnDetails2[3].toString());
+        //     // await time.advanceBlockTo('1800');
+        //     // await time.increaseTo('1605065963');
+        //     // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
+        //     // const burnDetails3 = await this.chillchef.getBurnedDetails();
+        //     // console.log('burnDetails: ', burnDetails3[0].toString());
+        //     // console.log('burnDetails: ', burnDetails3[1].toString());
+        //     // console.log('burnDetails: ', burnDetails3[2].toString());
+        //     // console.log('burnDetails: ', burnDetails3[3].toString());
+        //     // await time.increaseTo('1605152963');
+        //     // await this.chillchef.deposit('0', '0', { from: alice }); // harvest with 0 deposit amount
+        //     // const burnDetails4 = await this.chillchef.getBurnedDetails();
+        //     // console.log('burnDetails: ', burnDetails4[0].toString());
+        //     // console.log('burnDetails: ', burnDetails4[1].toString());
+        //     // console.log('burnDetails: ', burnDetails4[2].toString());
+        //     // console.log('burnDetails: ', burnDetails4[3].toString());
+        //     const alicebal = (await this.chill.balanceOf(alice)).valueOf();
+        //     const minterbal = (await this.chill.balanceOf(minter)).valueOf();
+        //     const devbal = (await this.chill.balanceOf(dev)).valueOf();
+        //     const chefbal = (await this.chill.balanceOf(this.chillchef.address)).valueOf();
+        //     const totalSupply = (await this.chill.totalSupply()).valueOf();
+        //     let isCorrectAlice;
+        //     if(parseInt(alicebal) > 7400000000000000000000) {
+        //         isCorrectAlice = true;
+        //     } else {
+        //         isCorrectAlice = false;
+        //     }
+        //     assert.equal(isCorrectAlice, true);
+        //     console.log('pendingChillAlice: ', pendingChillAlice.toString());
+        //     console.log("Alice: ", alicebal.toString());
+        //     console.log("Minter Nirvana-Rewarder: ", minterbal.toString());
+        //     console.log("Dev: ", devbal.toString());
+        //     console.log("Chef: ", chefbal.toString());
+        //     console.log("totalSupply: ", totalSupply.toString());
+        // });
         
         // it('should allow deposit on one lp two depositer', async () => {
         //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address,{ from: alice });

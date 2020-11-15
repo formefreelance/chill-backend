@@ -61,10 +61,14 @@ contract AirDrop {
         }
     }
 
-    function claimNirvanaReward(uint256 _pid) public returns(bool) {
+    function getNirvana(uint256 _pid) public view returns(uint256) {
         (,,uint256 startedBlock) = getUsersInfo(_pid, msg.sender);
         uint256 nirvanMultiplier = iChillFiinance.getNirvanaStatus(startedBlock);
-        require(nirvanMultiplier == NIRVANA_MULTIPLIER, "You are not Niravana user.");
+        return nirvanMultiplier;
+    }
+    
+    function claimNirvanaReward(uint256 _pid) public returns(bool) {
+        require(getNirvana(_pid) == NIRVANA_MULTIPLIER, "You are not Niravana user.");
         setNewScheduler();
         require(scheduleCount > 0, "Claim window is not open");
         require(!isNewRewardGiven[scheduleCount][msg.sender] && getCurrentTimeStamp() < claimTimeStamp, "Already Reward is Claimed, Wait for Next Snapshot");
@@ -120,6 +124,10 @@ contract AirDrop {
     
     function setChillFinance(address _chillFinance) public isOwner {
         iChillFiinance = IChillFinance(_chillFinance);
+    }
+
+    function setChillToken(address _chillToken) public isOwner {
+        chillToken = IERC20(_chillToken);
     }
     
     function getCurrentTimeStamp() public view returns(uint256) {

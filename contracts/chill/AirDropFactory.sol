@@ -12,7 +12,7 @@ contract AirDropFactory is Ownable {
     }
     
     function createNiravanaIncentivePool(address _lpPool) public onlyOwner {
-        AirDrop newAirDrop = new AirDrop(_lpPool, msg.sender);
+        AirDrop newAirDrop = new AirDrop(msg.sender);
         _airDropNirvanaAddress[_lpPool] = address(newAirDrop);
         lpPoolArray.push(_lpPool);
     }
