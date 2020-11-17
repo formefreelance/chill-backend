@@ -24,7 +24,7 @@ contract('AirDrop', ([alice, bob, carol, dev, minter]) => {
     });
 
     it('should set correct state variables', async () => {
-        this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });        
+        this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });        
         await this.chill.transferOwnership(this.chillchef.address, { from: alice });
         const chill = await this.chillchef.chill();
         const devaddr = await this.chillchef.devaddr();
@@ -35,7 +35,7 @@ contract('AirDrop', ([alice, bob, carol, dev, minter]) => {
     });
 
     it('should allow dev and only dev to update dev', async () => {
-        this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+        this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
         assert.equal((await this.chillchef.devaddr()).valueOf(), dev);
         // await expectRevert(this.chillchef.dev(bob, { from: dev }), 'dev: wut?');
         await this.chillchef.dev(bob, '0', '20' , { from: dev });
@@ -67,11 +67,11 @@ contract('AirDrop', ([alice, bob, carol, dev, minter]) => {
 
         
         it('should not deduct reward after nirvana', async () => {
-            this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+            this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
             await this.chill.transferOwnership(this.chillchef.address, { from: alice });
             await this.chillchef.addStakeUniPool(this.lp.address, this.stakingRewards.address, { from: alice });
             await this.chillchef.add('100', this.lp.address, true);
-            await this.chillchef.setNirvanaDetails('0', '5', this.airdrop.address);
+            await this.chillchef.set('0', '100', '5', this.airdrop.address, true);
             await this.lp.approve(this.chillchef.address, '1000', { from: alice });
             await this.lp.approve(this.chillchef.address, '2000', { from: bob });
             await time.advanceBlockTo('400');
@@ -117,7 +117,7 @@ contract('AirDrop', ([alice, bob, carol, dev, minter]) => {
             await this.airdrop.setChillToken(this.chill.address);
             const mul = await this.airdrop.getNirvana('0', {from: alice});
             console.log('Nirvana Alice=:', mul.toString());
-            await time.increaseTo('1605469407');
+            await time.increaseTo('1605641832');
             await this.airdrop.claimNirvanaReward('0', { from: alice });
             // await this.airdrop.claimNirvanaReward('0', {from: bob});
             const alicebal2 = (await this.chill.balanceOf(alice)).valueOf();

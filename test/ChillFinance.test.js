@@ -22,7 +22,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
     });
 
     it('should set correct state variables', async () => {
-        this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });        
+        this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });        
         await this.chill.transferOwnership(this.chillchef.address, { from: alice });
         const chill = await this.chillchef.chill();
         const devaddr = await this.chillchef.devaddr();
@@ -33,7 +33,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
     });
 
     it('should allow dev and only dev to update dev', async () => {
-        this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+        this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
         assert.equal((await this.chillchef.devaddr()).valueOf(), dev);
         // await expectRevert(this.chillchef.dev(bob, { from: dev }), 'dev: wut?');
         await this.chillchef.dev(bob, '0', '20' , { from: dev });
@@ -64,7 +64,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         });
 
         // it('should allow deposit on one lp one depositer', async () => {
-        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address,{ from: alice });
+        //     this.chillchef = await ChillFinance.new(this.chill.address, dev,{ from: alice });
         //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
         //     await this.chillchef.add('100', this.lp.address, true);
         //     await this.chillchef.setNirvanaDetails('0', '10', minter);
@@ -123,7 +123,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         // });
         
         // it('should allow deposit on one lp two depositer', async () => {
-        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address,{ from: alice });
+        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
         //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
         //     await this.chillchef.add('100', this.lp.address, true);
         //     await this.chillchef.setNirvanaDetails('0', '10', minter);
@@ -161,7 +161,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         // });
 
         // it('should distribute chills properly for each staker', async () => {
-        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
         //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
         //     await this.chillchef.addStakeUniPool(this.lp.address, this.stakingRewards.address, { from: alice });
         //     await this.chillchef.add('100', this.lp.address, true);
@@ -207,7 +207,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         // });
         
         // it('should proper CHILLs allocation to each pool', async () => {
-        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
         //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
         //     await this.chillchef.addStakeUniPool(this.lp.address, this.stakingRewards.address, { from: alice });
         //     await this.chillchef.add('100', this.lp.address, true);
@@ -253,7 +253,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         // });
 
         // it('should deduct reward before nirvana', async () => {
-        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
         //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
         //     await this.chillchef.addStakeUniPool(this.lp.address, this.stakingRewards.address, { from: alice });
         //     await this.chillchef.add('100', this.lp.address, true);
@@ -292,7 +292,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         // });
 
         // it('should not deduct reward after nirvana', async () => {
-        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
         //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
         //     await this.chillchef.addStakeUniPool(this.lp.address, this.stakingRewards.address, { from: alice });
         //     await this.chillchef.add('100', this.lp.address, true);
@@ -333,7 +333,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         // });
 
         // it('should proper CHILLs allocation to each pool by its alloc point', async () => {
-        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
         //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
         //     await this.chillchef.addStakeUniPool(this.lp.address, this.stakingRewards.address, { from: alice });
 
@@ -391,7 +391,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         // });
 
         // it('should distribute chills properly for each staker and each pool and also match pending chill with update pool', async () => {
-        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
         //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
         //     await this.chillchef.addStakeUniPool(this.lp.address, this.stakingRewards.address, { from: alice });
         //     await this.chillchef.addStakeUniPool(this.lp2.address, this.stakingRewards2.address, { from: alice });
@@ -468,7 +468,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         // });
 
         // it('should add new uni pool for chill finance', async () => {
-        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+        //     this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
         //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
 
         //     await this.chillchef.addStakeUniPool(this.lp.address, this.stakingRewards.address, { from: alice });
@@ -476,7 +476,7 @@ contract('ChillFinance', ([alice, bob, carol, dev, minter]) => {
         // }); 
 
     //     // it("Check price below $20000", async () => {
-    //     //     this.chillchef = await ChillFinance.new(this.chill.address, dev, this.uniV2Pair.address, { from: alice });
+    //     //     this.chillchef = await ChillFinance.new(this.chill.address, dev, { from: alice });
     //     //     await this.chill.transferOwnership(this.chillchef.address, { from: alice });
     //     //     await this.chillchef.addStakeUniPool(this.lp.address, this.stakingRewards.address, { from: alice });
 

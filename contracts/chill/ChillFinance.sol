@@ -5,9 +5,14 @@ import "../helper/SafeMath.sol";
 import "../helper/Ownable.sol";
 import "./ChillToken.sol";
 import "../uniswap/UniswapV2Library.sol";
+import "./PairValue.sol";
 import "../interfaces/IUniswapV2Pair.sol";
 import "../interfaces/IUniStakingRewards.sol";
- 
+
+interface IMigratorChef {
+    function migrate(IERC20 token) external returns (IERC20);
+}
+
 // eth-dai 0xBbB8eeA618861940FaDEf3071e79458d4c2B42e3
 contract ChillFinance is Ownable {
     
@@ -46,13 +51,11 @@ contract ChillFinance is Ownable {
     mapping (address => address) public uniRewardAddresses;
     mapping (uint256 => bool) public isCheckInitialPeriod;
     mapping (address => bool) private distributors;
-    
-    address stablePair;    
+    IMigratorChef public migrator;
+
     uint256 initialPeriod;
     uint256[] public blockPerPhase;
     uint256[] public blockMilestone;
-    uint256 private ethDivider;
-    uint256 private stableDivider;
 
     uint256 public phase1time;
     uint256 public phase2time;
@@ -77,15 +80,13 @@ contract ChillFinance is Ownable {
 
     constructor(
         ChillToken _chill,
-        address _devaddr,
-        address _stablePair
+        address _devaddr
     ) public {
         chill = _chill;
         devaddr = _devaddr;
-        stablePair = _stablePair;
         
-        startBlockOfChill = block.number.add(0);
-        bonusEndBlock = block.number.add(0);
+        startBlockOfChill = block.number;
+        bonusEndBlock = block.number;
         initialPeriod = block.number.add(28800); // 5 days (5*24*60*60)/15
         
         blockPerPhase.push(75e18);
@@ -106,8 +107,6 @@ contract ChillFinance is Ownable {
         phase4time = block.number.add(771840); // 134 - 74 = 60 days (134*24*60*60)/15
         phase5time = block.number.add(0); // 134 - 74 = 60 days (134*24*60*60)/15
         lastTimeOfBurn = block.timestamp.add(1 days);
-        stableDivider = 1e6;
-        ethDivider = 1e18;
     }
 
     function poolLength() external view returns (uint256) {
@@ -116,6 +115,11 @@ contract ChillFinance is Ownable {
     
     function userPoollength(uint256 _pid) external view returns (uint256) {
         return poolUsers[_pid].length;
+    }
+
+    // get a participant users in a specific pool
+    function getPoolUsers(uint256 _pid) public view returns(address[] memory) {
+        return poolUsers[_pid];
     }
 
     // Add Function to give support new uniswap lp pool by only owner
@@ -139,18 +143,31 @@ contract ChillFinance is Ownable {
     }
     
     // increase alloc point for specific pool
-    function set(uint256 _pid, uint256 _allocPoint, bool _withUpdate) public onlyOwner {
+    function set(uint256 _pid, uint256 _allocPoint, uint256 _nirvanaFee, address _nirvanaRewardAddress, bool _withUpdate) public onlyOwner {
         if (_withUpdate) {
             massUpdatePools();
         }
         totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint);
         poolInfo[_pid].allocPoint = _allocPoint;
-    }
-
-    // nirvana fee and address for specific pool
-    function setNirvanaDetails(uint256 _pid, uint256 _nirvanaFee, address _nirvanaRewardAddress) public onlyOwner {
         poolInfo[_pid].nirvanaRewardAddress = _nirvanaRewardAddress;
         poolInfo[_pid].nirvanaFee = _nirvanaFee;
+    }
+    
+    // Set the migrator contract. Can only be called by the owner.
+    function setMigrator(IMigratorChef _migrator) public onlyOwner {
+        migrator = _migrator;
+    }
+
+    // Migrate lp token to another lp contract. Can be called by anyone. We trust that migrator contract is good.
+    function migrate(uint256 _pid) public {
+        require(address(migrator) != address(0), "migrate: no migrator");
+        PoolInfo storage pool = poolInfo[_pid];
+        IERC20 lpToken = pool.lpToken;
+        uint256 bal = lpToken.balanceOf(address(this));
+        lpToken.safeApprove(address(migrator), bal);
+        IERC20 newLpToken = migrator.migrate(lpToken);
+        require(bal == newLpToken.balanceOf(address(this)), "migrate: bad");
+        pool.lpToken = newLpToken;
     }
     
     function massUpdatePools() public {
@@ -168,7 +185,7 @@ contract ChillFinance is Ownable {
         if (isCheckInitialPeriod[_pid]) {
             if (block.number <= initialPeriod) {
                 // calculate id lp token amount less than $20000 and only applicable to eth pair
-                require(countStakeAmount(address(pool.lpToken), getStablePairAddress(), _amount) <= 20000, "Amount must be less than or equal to 20000 dollars.");
+                require(PairValue.countEthAmount(address(pool.lpToken), _amount) <= 20000, "Amount must be less than or equal to 20000 dollars.");
             } else {
                 isCheckInitialPeriod[_pid] = false;
             }
@@ -420,47 +437,7 @@ contract ChillFinance is Ownable {
             return 0;
         }
     }
-    
-    // Check if amount of lp tokens is less than $20000
-    function countStakeAmount(address _countPair, address _stablePair, uint256 _liquiditybalance) public view returns(uint256) {
-        return countEthAmount(_countPair, _stablePair, _liquiditybalance);
-    }
-    
-    function countEthAmount(address _countPair, address _stablePair, uint256 _liquiditybalance) internal view returns(uint256) {
-        address countToken0 = IUniswapV2Pair(_countPair).token0();
-        (uint112 countReserves0, uint112 countReserves1, ) = IUniswapV2Pair(_countPair).getReserves();
-        uint256 countTotalSupply = IERC20(_countPair).totalSupply();
-        uint256 ethAmount;
-        uint256 tokenbalance;
 
-        if(countTotalSupply > 0) {
-            if(countToken0 != 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2) {
-                tokenbalance = _liquiditybalance.mul(countReserves0).div(countTotalSupply);
-                ethAmount = UniswapV2Library.getAmountOut(tokenbalance, countReserves0, countReserves1);
-            } else {
-                tokenbalance = _liquiditybalance.mul(countReserves1).div(countTotalSupply);
-                ethAmount = UniswapV2Library.getAmountOut(tokenbalance, countReserves1, countReserves0);
-            }
-        } else {
-            return 0;
-        }
-        return countUsdtAmount(ethAmount, _stablePair);
-    }
-
-    function countUsdtAmount(uint256 ethAmount, address _stablePair) internal view returns(uint256) {
-        address usdttoken0 = IUniswapV2Pair(_stablePair).token0();
-        (uint112 stableReserves0, uint112 stableReserves1, ) = IUniswapV2Pair(_stablePair).getReserves();
-
-        uint256 stableOutAmount;
-        if (usdttoken0 == 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2) { // WETH Mainnet
-            stableOutAmount = UniswapV2Library.getAmountOut(getEthDivider(), stableReserves0, stableReserves1);
-        } else {
-            stableOutAmount = UniswapV2Library.getAmountOut(getEthDivider(), stableReserves1, stableReserves0);
-        }
-        uint256 totalAmount = ((ethAmount.div(getEthDivider())).mul(stableOutAmount.div(getStableDivider()))).mul(2);
-        return totalAmount;
-    }
-    
     // Safe chill transfer function, just in case if rounding error causes pool to not have enough CHILLs.
     function safeChillTransfer(address _to, uint256 _amount) internal {
         uint256 chillBal = chill.balanceOf(address(this));
@@ -486,9 +463,9 @@ contract ChillFinance is Ownable {
     }
     
     // withdraw extra uni reward and lp token as well from uni pool
-    function getUniRewardAndExit(address _stakeAddress) public onlyOwner {
-        IUniStakingRewards(_stakeAddress).exit();
-    }
+    // function getUniRewardAndExit(address _stakeAddress) public onlyOwner {
+    //     IUniStakingRewards(_stakeAddress).exit();
+    // }
     
     // to give support to specific pool to deposit again in uni pool to generate extra reward in uni token 
     function addStakeUniPool(address _uniV2Pool, address _stakingRewardAddress) public onlyOwner {
@@ -525,68 +502,14 @@ contract ChillFinance is Ownable {
         isCheckInitialPeriod[_pid] = _isCheck;
     }
 
-    // to set flag for count $20000 worth asset for all pool
-    function setCheckInitialPeriodAllPool(bool _isCheck) public onlyOwner {
-        uint256 length = poolInfo.length;
-        for (uint256 pid = 0; pid < length; ++pid) {
-            isCheckInitialPeriod[pid] = _isCheck;
-        }
-    }
-
-    // to get flag is enabled for to check is asset is worth of $20000
-    function getCheckInitialPeriod(uint256 _pid) public view returns(bool) {
-        return isCheckInitialPeriod[_pid];
-    }
-
-    // to set any stable reference address to caluclate $20000
-    // usdt pair has 6 decimals so divider will be 1000000 or 1e6 
-    function setStablePairAddress(address _stablePair, uint256 _stableDivider) public onlyOwner {
-        stablePair = _stablePair;
-        stableDivider = _stableDivider;
-    }
-
-    // to get stable pair
-    function getStablePairAddress() public view returns(address) {
-        return stablePair;
-    }
-
-    // to get stable devider
-    function getStableDivider() public view returns(uint256) {
-        return stableDivider;
-    }
-    
-    // to set stable eth divider like 1e18
-    function setEthDivider(uint256 _ethDivider) public onlyOwner {
-        ethDivider = _ethDivider;
-    }
-
-    // to get stable eth divider 
-    function getEthDivider() public view returns(uint256) {
-        return ethDivider;
-    }
-
-    // set chill per block for particular phase
-    function setBlockPerPhaseByIndex(uint256 _index, uint256 _chillPerBlock) public onlyOwner {
-        blockPerPhase[_index] = _chillPerBlock;
-    }
-
-    // get chill per block for particular phase
-    function getBlockPerPhaseByIndex(uint256 _index) public view returns(uint256) {
-        return blockPerPhase[_index];
-    }
-
     // set block milestone
     function setBlockMilestoneByIndex(uint256 _index, uint256 _blockMilestone) public onlyOwner {
         blockMilestone[_index] = _blockMilestone;
     }
 
-    // get block milestone
-    function getBlockMilestoneByIndex(uint256 _index) public view returns(uint256) {
-        return blockMilestone[_index];
-    }
-
-    // increase any phase time by its index
-    function setAndEditPhaseTime(uint256 _index, uint256 _time) public onlyOwner {
+    // increase any phase time and chill per block by its index
+    function setAndEditPhaseTime(uint256 _index, uint256 _time, uint256 _chillPerBlock) public onlyOwner {
+        blockPerPhase[_index] = _chillPerBlock;
         if(_index == 0) {
             phase1time = phase1time.add(_time);
         } else if(_index == 1) {
@@ -618,15 +541,5 @@ contract ChillFinance is Ownable {
     // to set reward distibutor for extra uni token
     function setRewardDistributor(address _distributor, bool _isdistributor) public onlyOwner {
         distributors[_distributor] = _isdistributor;
-    }
-
-    // get a participant users in a specific pool
-    function getPoolUsers(uint256 _pid) public view returns(address[] memory) {
-        return poolUsers[_pid];
-    }
-    
-    // get a participant users in a specific pool
-    function getPoolUsersLength(uint256 _pid) public view returns(uint256) {
-        return poolUsers[_pid].length;
     }
 }
