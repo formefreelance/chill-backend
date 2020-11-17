@@ -50,6 +50,7 @@ contract ChillFinance is Ownable {
     address stablePair;    
     uint256 initialPeriod;
     uint256[] public blockPerPhase;
+    uint256[] public blockMilestone;
     uint256 private ethDivider;
     uint256 private stableDivider;
 
@@ -92,6 +93,12 @@ contract ChillFinance is Ownable {
         blockPerPhase.push(50e18);
         blockPerPhase.push(25e18);
         blockPerPhase.push(0);
+
+        blockMilestone.push(1920);
+        blockMilestone.push(3840);
+        blockMilestone.push(5760);
+        blockMilestone.push(7680);
+        blockMilestone.push(9600);
 
         phase1time = block.number.add(80640); // 14 days (14*24*60*60)/15
         phase2time = block.number.add(253440); // 44 - 14 = 30 days (44*24*60*60)/15 
@@ -381,16 +388,16 @@ contract ChillFinance is Ownable {
     }
     
     // Set extra reward after each 8 hours(1920 block)
-    function getTotalBlocksCovered(uint256 _block) internal pure returns(uint256) {
-        if (_block >= 9600) {
+    function getTotalBlocksCovered(uint256 _block) internal view returns(uint256) {
+        if (_block >= blockMilestone[4]) { // 9600
             return 50;
-        } else if (_block >= 7680) {
+        } else if (_block >= blockMilestone[3]) { // 7680
             return 40;
-        } else if (_block >= 5760) {
+        } else if (_block >= blockMilestone[2]) { // 5760
             return 30;
-        } else if (_block >= 3840) {
+        } else if (_block >= blockMilestone[1]) { // 3840
             return 20;
-        } else if (_block >= 1920) {
+        } else if (_block >= blockMilestone[0]) { // 1920
             return 10;
         } else {
             return 0;
@@ -398,16 +405,16 @@ contract ChillFinance is Ownable {
     }
     
     // Deduct tax if user withdraw before nirvana at different stage
-    function deductTaxByBlock(uint256 _block) internal pure returns(uint256) {
-        if (_block <= 1920) {
+    function deductTaxByBlock(uint256 _block) internal view returns(uint256) {
+        if (_block <= blockMilestone[0]) { // 1920
             return 50;
-        } else if (_block <= 3840) {
+        } else if (_block <= blockMilestone[1]) { // 3840
             return 40;
-        } else if (_block <= 5760) {
+        } else if (_block <= blockMilestone[2]) { // 5760
             return 30;
-        } else if (_block <= 7680) {
+        } else if (_block <= blockMilestone[3]) { // 7680
             return 20;
-        } else if (_block <= 9600) {
+        } else if (_block <= blockMilestone[4]) { // 9600
             return 10;
         }  else {
             return 0;
@@ -566,6 +573,16 @@ contract ChillFinance is Ownable {
     // get chill per block for particular phase
     function getBlockPerPhaseByIndex(uint256 _index) public view returns(uint256) {
         return blockPerPhase[_index];
+    }
+
+    // set block milestone
+    function setBlockMilestoneByIndex(uint256 _index, uint256 _blockMilestone) public onlyOwner {
+        blockMilestone[_index] = _blockMilestone;
+    }
+
+    // get block milestone
+    function getBlockMilestoneByIndex(uint256 _index) public view returns(uint256) {
+        return blockMilestone[_index];
     }
 
     // increase any phase time by its index

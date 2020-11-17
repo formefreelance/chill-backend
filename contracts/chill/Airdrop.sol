@@ -77,6 +77,7 @@ contract AirDrop {
         (uint256 userBalance,,) = getUsersInfo(_pid, msg.sender);
         uint256 transferBalancePercent = userBalance.mul(100).div(poolBalance);
         uint256 transferBalance = transferBalancePercent.mul(rewardAmount).div(100);
+        require(chillToken.balanceOf(address(this)) >= transferBalance, "Not Enough Balance in Nirvana Pool.");
         chillToken.transfer(msg.sender, transferBalance);
         return true;
     }
@@ -132,5 +133,9 @@ contract AirDrop {
     
     function getCurrentTimeStamp() public view returns(uint256) {
         return block.timestamp;
+    }
+
+    function transferOwnership(address _owner) public isOwner {
+        owner = _owner;
     }
 }
