@@ -6,12 +6,9 @@ import "../helper/SafeMath.sol";
 
 contract AirDrop {
     using SafeMath for uint256;
-    
     IERC20 public chillToken;
     IChillFinance public iChillFiinance;
-    
     address public owner;
-    
     uint256 public nirwanaReward;
     uint256 public timeSchedule;
     uint256 public claimSchedule;
@@ -20,7 +17,6 @@ contract AirDrop {
     uint256 public rewardAmount;
     uint256 public scheduleCount = 0;
     uint256 public NIRVANA_MULTIPLIER = 50;
-    
     mapping (uint256 => mapping(address => bool)) public isNewRewardGiven;
     
     constructor(address _owner) public {
