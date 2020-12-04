@@ -10,12 +10,6 @@ import "../interfaces/IWETH.sol";
 // CHILL with Governance.
 contract ChillToken is ERC20("CHILLSWAP", "CHILL"), Ownable {
 
-    // Copied and modified from YAM code:
-    // https://github.com/yam-finance/yam-protocol/blob/master/contracts/token/YAMGovernanceStorage.sol
-    // https://github.com/yam-finance/yam-protocol/blob/master/contracts/token/YAMGovernance.sol
-    // Which is copied and modified from COMPOUND:
-    // https://github.com/compound-finance/compound-protocol/blob/master/contracts/Governance/Comp.sol
-
     // "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D","0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f","0xd0A1E359811322d97991E03f863a0C30C2cF029C","2000000000000000000","100000000000000","0x48845392F5a7c6b360A733e0ABE2EdcC74f1F4d6","1666671378"
     // "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D","0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f","0xd0A1E359811322d97991E03f863a0C30C2cF029C"
 
@@ -49,7 +43,7 @@ contract ChillToken is ERC20("CHILLSWAP", "CHILL"), Ownable {
     /// @notice A record of states for signing / validating signatures
     mapping (address => uint) public nonces;
     
-      /// @notice An event thats emitted when an account changes its delegate
+    /// @notice An event thats emitted when an account changes its delegate
     event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
 
     /// @notice An event thats emitted when a delegate account's vote balance changes
@@ -67,33 +61,10 @@ contract ChillToken is ERC20("CHILLSWAP", "CHILL"), Ownable {
         iUniswapV2Router02 = IUniswapV2Router02(_uniswapRouter);
         iWeth = IWETH(_wethAddress);
         mint(msg.sender, 20000e18);
-        // createPair(address(this), _wethAddress);
-        // addLiquidity(address(this), _wethAddress, amountA, amountB, 0, 0, to, deadline);
     }
 
     function createPair(address tokenA, address tokenB) public {
         iUniswapV2Factory.createPair(tokenA, tokenB);
-    }
-    
-    function addLiquidity(
-        address _tokenA, 
-        address _tokenB, 
-        uint256 amountADesired, 
-        uint256 amountBDesired, 
-        uint256 amountAMin,
-        uint256 amountBMin, 
-        address to, 
-        uint256 deadline
-    ) public payable onlyOwner {
-        iWeth.deposit{value: msg.value}();
-        tokenA = IERC20(_tokenA);
-        tokenA.transferFrom(msg.sender, address(this), amountADesired);
-        tokenA.approve(address(iUniswapV2Router02), amountADesired);
-        tokenB = IERC20(_tokenB);
-        tokenB.approve(address(iUniswapV2Router02), amountBDesired);
-        iUniswapV2Router02.addLiquidity(
-            _tokenA, _tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline    
-        );
     }
 
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).

@@ -18,6 +18,11 @@ contract AirDrop {
     uint256 public scheduleCount = 0;
     uint256 public NIRVANA_MULTIPLIER = 50;
     mapping (uint256 => mapping(address => bool)) public isNewRewardGiven;
+
+    modifier isOwner {
+        require(owner == msg.sender, "Error: Address is not owner");
+        _;
+    }
     
     constructor(address _owner) public {
         iChillFiinance = IChillFinance(0xa15E697806711003E635bEe08CA049130C4917fd);
@@ -38,11 +43,9 @@ contract AirDrop {
         uint256 currentTimeStamp = getCurrentTimeStamp();
         timeStamp = currentTimeStamp.add(timeSchedule);
         claimTimeStamp = currentTimeStamp.add(timeSchedule).add(claimSchedule);
-    }
-    
-    modifier isOwner {
-        require(owner == msg.sender, "Error: Address is not owner");
-        _;
+        uint256 chillBalance = chillToken.balanceOf(address(this));
+        uint256 chillReward = chillBalance.mul(nirwanaReward).div(100);
+        rewardAmount = chillReward;
     }
     
     function setNewScheduler() internal {

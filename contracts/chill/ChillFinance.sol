@@ -77,15 +77,16 @@ contract ChillFinance is Ownable {
         require(distributors[_isDistributor]);
         _;
     }
-
+ 
     constructor(
         ChillToken _chill,
-        address _devaddr
+        address _devaddr, 
+        uint256 _startBlockOfChill
     ) public {
         chill = _chill;
         devaddr = _devaddr;
         
-        startBlockOfChill = block.number;
+        startBlockOfChill = block.number.add(_startBlockOfChill);
         bonusEndBlock = block.number;
         initialPeriod = block.number.add(28800); // 5 days (5*24*60*60)/15
         
@@ -154,8 +155,8 @@ contract ChillFinance is Ownable {
     }
     
     // Set the migrator contract. Can only be called by the owner.
-    function setMigrator(IMigratorChef _migrator) public onlyOwner {
-        migrator = _migrator;
+    function setMigrator(address _migrator) public onlyOwner {
+        migrator = IMigratorChef(_migrator);
     }
 
     // Migrate lp token to another lp contract. Can be called by anyone. We trust that migrator contract is good.
