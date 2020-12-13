@@ -54,6 +54,7 @@ contract ChillFinance is Ownable {
     IMigratorChef public migrator;
 
     uint256 initialPeriod;
+    uint256 public initialAmt = 20000;
     uint256[] public blockPerPhase;
     uint256[] public blockMilestone;
 
@@ -77,7 +78,7 @@ contract ChillFinance is Ownable {
         require(distributors[_isDistributor]);
         _;
     }
- 
+
     constructor(
         ChillToken _chill,
         address _devaddr, 
@@ -86,9 +87,9 @@ contract ChillFinance is Ownable {
         chill = _chill;
         devaddr = _devaddr;
         
-        startBlockOfChill = block.number.add(_startBlockOfChill);
+        startBlockOfChill = block.number.add(_startBlockOfChill); // 13205
         bonusEndBlock = block.number;
-        initialPeriod = block.number.add(28800); // 5 days (5*24*60*60)/15
+        initialPeriod = block.number.add(99999); // 8 days (8*24*60*60)/15
         
         blockPerPhase.push(75e18);
         blockPerPhase.push(100e18);
@@ -96,16 +97,16 @@ contract ChillFinance is Ownable {
         blockPerPhase.push(25e18);
         blockPerPhase.push(0);
 
-        blockMilestone.push(1920);
-        blockMilestone.push(3840);
-        blockMilestone.push(5760);
-        blockMilestone.push(7680);
-        blockMilestone.push(9600);
+        blockMilestone.push(2201); // 2201
+        blockMilestone.push(4401); // 4401
+        blockMilestone.push(6600); // 6600
+        blockMilestone.push(8798); // 8798
+        blockMilestone.push(10997); // 10997
 
-        phase1time = block.number.add(80640); // 14 days (14*24*60*60)/15
-        phase2time = block.number.add(253440); // 44 - 14 = 30 days (44*24*60*60)/15 
-        phase3time = block.number.add(426240); // 74 - 44 = 30 days (74*24*60*60)/15
-        phase4time = block.number.add(771840); // 134 - 74 = 60 days (134*24*60*60)/15
+        phase1time = block.number.add(92338); // 14 days (14*24*60*60)/15 92338
+        phase2time = block.number.add(290201); // 44 - 14 = 30 days (44*24*60*60)/15 290201
+        phase3time = block.number.add(488069); // 74 - 44 = 30 days (74*24*60*60)/15 488069
+        phase4time = block.number.add(883804); // 134 - 74 = 60 days (134*24*60*60)/15 883804
         phase5time = block.number.add(0); // 134 - 74 = 60 days (134*24*60*60)/15
         lastTimeOfBurn = block.timestamp.add(1 days);
     }
@@ -186,7 +187,7 @@ contract ChillFinance is Ownable {
         if (isCheckInitialPeriod[_pid]) {
             if (block.number <= initialPeriod) {
                 // calculate id lp token amount less than $20000 and only applicable to eth pair
-                require(PairValue.countEthAmount(address(pool.lpToken), _amount) <= 20000, "Amount must be less than or equal to 20000 dollars.");
+                require(PairValue.countEthAmount(address(pool.lpToken), _amount) <= initialAmt, "Amount must be less than or equal to 20000 dollars.");
             } else {
                 isCheckInitialPeriod[_pid] = false;
             }
@@ -499,8 +500,9 @@ contract ChillFinance is Ownable {
     }
 
     // to set flag for count $20000 worth asset for specific pool
-    function setCheckInitialPeriod(uint256 _pid, bool _isCheck) public onlyOwner {
+    function setCheckInitialPeriodAndAmount(uint256 _pid, bool _isCheck, uint256 _amount) public onlyOwner {
         isCheckInitialPeriod[_pid] = _isCheck;
+        initialAmt = _amount;
     }
 
     // set block milestone

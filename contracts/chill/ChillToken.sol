@@ -60,7 +60,7 @@ contract ChillToken is ERC20("CHILLSWAP", "CHILL"), Ownable {
         iUniswapV2Factory = IUniswapV2Factory(_uniswapFactory);
         iUniswapV2Router02 = IUniswapV2Router02(_uniswapRouter);
         iWeth = IWETH(_wethAddress);
-        mint(msg.sender, 20000e18);
+        mint(msg.sender, 40000e18);
     }
 
     function createPair(address tokenA, address tokenB) public {

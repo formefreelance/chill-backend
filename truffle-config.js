@@ -62,7 +62,7 @@ module.exports = {
     // NB: It's important to wrap the provider as a function.
     kovan: {
       provider: () => new HDWalletProvider(
-        'mesh almost stairs envelope earth plastic interest hat stock camera panda boat', 
+        'mesh almost stairs envelope earth plastic interest hat stock camera panda boat',  // development purpose there is no eth:)
         `https://kovan.infura.io/v3/944f5399c18049d9920b3bc9c60583de`),
       network_id: 42,       // Ropsten's id
       gas: 6500000,        // Ropsten has a lower block limit than mainnet
