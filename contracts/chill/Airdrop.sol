@@ -9,6 +9,7 @@ contract AirDrop {
     IERC20 public chillToken;
     IChillFinance public iChillFiinance;
     address public owner;
+    address public implementation;
     uint256 public nirwanaReward;
     uint256 public timeSchedule;
     uint256 public claimSchedule;
@@ -31,110 +32,92 @@ contract AirDrop {
         nirwanaReward = 10; // Nirvana Reward Percentage
         timeSchedule = 28800; // 8 hours
         claimSchedule = 27000; // 15 hours 30 mins
-        uint256 currentTimeStamp = getCurrentTimeStamp();
+        uint256 currentTimeStamp = block.timestamp;
         timeStamp = currentTimeStamp.add(timeSchedule);
         claimTimeStamp = currentTimeStamp.add(timeSchedule).add(claimSchedule);
     }
     
+    
+    // Contract Implementation Methods (Logic Contracts)
+    function addImplementation(address _implementation) public isOwner {
+        implementation = _implementation;
+    }
+    
+    // Upgradable Delegated Call Methods 
     function startPool(uint256 _timeSchedule, uint256 _claimSchedule, uint256 _nirvanaReward) public isOwner {
-        nirwanaReward = _nirvanaReward; // Nirvana Reward Percentage
-        timeSchedule = _timeSchedule; // 8 hours
-        claimSchedule = _claimSchedule; // 15 hours 30 mins
-        uint256 currentTimeStamp = getCurrentTimeStamp();
-        timeStamp = currentTimeStamp.add(timeSchedule);
-        claimTimeStamp = currentTimeStamp.add(timeSchedule).add(claimSchedule);
-        uint256 chillBalance = chillToken.balanceOf(address(this));
-        uint256 chillReward = chillBalance.mul(nirwanaReward).div(100);
-        rewardAmount = chillReward;
-    }
-    
-    function setNewScheduler() internal {
-        if (getCurrentTimeStamp() > timeStamp) {
-            uint256 currentTimeStamp = getCurrentTimeStamp();
-            timeStamp = currentTimeStamp.add(timeSchedule); // increase by 8 hours
-            uint256 chillBalance = chillToken.balanceOf(address(this));
-            uint256 chillReward = chillBalance.mul(nirwanaReward).div(100);
-            rewardAmount = chillReward;
-            scheduleCount = scheduleCount.add(1);
-            claimTimeStamp = currentTimeStamp.add(claimSchedule); // 7 hours 30 mins
-        }
-    }
-
-    function getNirvana(uint256 _pid) public view returns(uint256) {
-        (,,uint256 startedBlock) = getUsersInfo(_pid, msg.sender);
-        uint256 nirvanMultiplier = iChillFiinance.getNirvanaStatus(startedBlock);
-        return nirvanMultiplier;
+        (bool success,) = implementation.delegatecall(abi.encodeWithSignature("startPool(uint256,uint256,uint256)", _timeSchedule, _claimSchedule, _nirvanaReward));   
+        require(success, "startPool(uint256 _timeSchedule, uint256 _claimSchedule, uint256 _nirvanaReward) delegatecall failed.");
     }
     
     function claimNirvanaReward(uint256 _pid) public returns(bool) {
-        require(getNirvana(_pid) == NIRVANA_MULTIPLIER, "You are not Niravana user.");
-        setNewScheduler();
-        require(scheduleCount > 0, "Claim window is not open");
-        require(!isNewRewardGiven[scheduleCount][msg.sender] && getCurrentTimeStamp() < claimTimeStamp, "Already Reward is Claimed, Wait for Next Snapshot");
-        isNewRewardGiven[scheduleCount][msg.sender] = true;
-        (,,,,uint256 poolBalance,,) = getPoolInfo(_pid);
-        (uint256 userBalance,,) = getUsersInfo(_pid, msg.sender);
-        uint256 transferBalancePercent = userBalance.mul(100).div(poolBalance);
-        uint256 transferBalance = transferBalancePercent.mul(rewardAmount).div(100);
-        require(chillToken.balanceOf(address(this)) >= transferBalance, "Not Enough Balance in Nirvana Pool.");
-        chillToken.transfer(msg.sender, transferBalance);
-        return true;
-    }
-    
-    function getAllUsers(uint256 _pid) public view returns(address[] memory, uint256) {
-        uint256 userLength = iChillFiinance.userPoollength(_pid);
-        address[] memory nirvanaAddresses = new address[](userLength);
-        address poolUser;
-        uint256 count = 0;
-        for (uint i = 0; i < userLength; i++) {
-            poolUser = iChillFiinance.poolUsers(_pid, i);
-            (,,uint256 startedBlock) = getUsersInfo(_pid, poolUser);
-            uint256 nirvanMultiplier = iChillFiinance.getNirvanaStatus(startedBlock);
-            if (nirvanMultiplier == NIRVANA_MULTIPLIER) {
-                nirvanaAddresses[count] = poolUser;
-                count = count.add(1);
-            }
-        }
-        return (nirvanaAddresses, count);
+        (bool success,) = implementation.delegatecall(abi.encodeWithSignature("claimNirvanaReward(uint256)", _pid));
+        require(success, "claimNirvanaReward(uint256 _pid) delegatecall failed.");
+        return success;
     }
     
     function setNirvanaReward(uint256 _rewards) public isOwner {
-        nirwanaReward = _rewards;
+        (bool success,) = implementation.delegatecall(abi.encodeWithSignature("setNirvanaReward(uint256)", _rewards));
+        require(success, "setNirvanaReward(uint256 _rewards) delegatecall failed.");
     }
     
     function setTimeSchedule(uint256 _timeSchedule) public isOwner {
-        timeSchedule = _timeSchedule;
+        (bool success,) = implementation.delegatecall(abi.encodeWithSignature("setTimeSchedule(uint256)", _timeSchedule));
+        require(success, "setTimeSchedule(uint256 _timeSchedule) delegatecall failed.");
     }
     
     function setClaimTimeSchedule(uint256 _claimSchedule) public isOwner {
-        claimSchedule = _claimSchedule;
+        (bool success,) = implementation.delegatecall(abi.encodeWithSignature("setClaimTimeSchedule(uint256)", _claimSchedule));
+        require(success, "setClaimTimeSchedule(uint256 _claimSchedule) delegatecall failed.");
     }
     
     function setNirVanaMultiplier(uint256 _nirvanaMultiplier) public isOwner {
-        NIRVANA_MULTIPLIER = _nirvanaMultiplier;
-    }
-    
-    function getUsersInfo(uint256 _pid, address _user) public view returns (uint256, uint256, uint256) {
-        return iChillFiinance.userInfo(_pid, _user);
-    }
-    
-    function getPoolInfo(uint256 _pid) public view returns (IERC20, uint256, uint256, uint256, uint256, address, uint256) {
-        return iChillFiinance.poolInfo(_pid);
+        (bool success,) = implementation.delegatecall(abi.encodeWithSignature("setNirVanaMultiplier(uint256)", _nirvanaMultiplier));
+        require(success, "setNirVanaMultiplier(uint256 _nirvanaMultiplier) delegatecall failed.");
     }
     
     function setChillFinance(address _chillFinance) public isOwner {
-        iChillFiinance = IChillFinance(_chillFinance);
+        (bool success,) = implementation.delegatecall(abi.encodeWithSignature("setChillFinance(address)", _chillFinance));
+        require(success, "setChillFinance(address _chillFinance) delegatecall failed.");
     }
 
     function setChillToken(address _chillToken) public isOwner {
-        chillToken = IERC20(_chillToken);
-    }
-    
-    function getCurrentTimeStamp() public view returns(uint256) {
-        return block.timestamp;
+        (bool success,) = implementation.delegatecall(abi.encodeWithSignature("setChillToken(address)", _chillToken));
+        require(success, "setChillToken(address _chillToken) delegatecall failed.");
     }
 
     function transferOwnership(address _owner) public isOwner {
-        owner = _owner;
+        (bool success,) = implementation.delegatecall(abi.encodeWithSignature("transferOwnership(address)", _owner));
+        require(success, "transferOwnership(address _owner) delegatecall failed.");
+    }
+    
+    // Upgradable Static Call Methods 
+    function getNirvana(uint256 _pid) public view returns(uint256) {
+        (bool success, bytes memory result) = implementation.staticcall(abi.encodeWithSignature("getNirvana(uint256)", _pid));
+        require(success, "getNirvana(uint256 _pid) staticcall failed.");
+        return abi.decode(result, (uint256));
+    }
+    
+    function getAllUsers(uint256 _pid) public view returns(address[] memory, uint256) {
+        (bool success, bytes memory result) = implementation.staticcall(abi.encodeWithSignature("getAllUsers(uint256)", _pid));
+        require(success, "getAllUsers(uint256 _pid) staticcall failed.");
+        return abi.decode(result, (address[], uint256));
+    }
+    
+    function getUsersInfo(uint256 _pid, address _user) public view returns (uint256, uint256, uint256) {
+        (bool success, bytes memory result) = implementation.staticcall(abi.encodeWithSignature("getUsersInfo(uint256,address)", _pid, _user));
+        require(success, "getUsersInfo(uint256 _pid, address _user) staticcall failed.");
+        return abi.decode(result, (uint256, uint256, uint256));
+    }
+    
+    function getPoolInfo(uint256 _pid) public view returns (IERC20, uint256, uint256, uint256, uint256, address, uint256) {
+        (bool success, bytes memory result) = implementation.staticcall(abi.encodeWithSignature("getPoolInfo(uint256)", _pid));
+        require(success, "getPoolInfo(uint256 _pid) staticcall failed.");
+        return abi.decode(result, (IERC20, uint256, uint256, uint256, uint256, address, uint256));
+    }
+    
+    function getCurrentTimeStamp() public view returns(uint256) {
+        (bool success, bytes memory result) = implementation.staticcall(abi.encodeWithSignature("getCurrentTimeStamp()"));
+        require(success, "getCurrentTimeStamp() staticcall failed.");
+        return abi.decode(result, (uint256));
     }
 }
