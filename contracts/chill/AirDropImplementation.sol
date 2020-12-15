@@ -19,6 +19,7 @@ contract AirDropImplementation is IAirDrop  {
     uint256 public rewardAmount;
     uint256 public scheduleCount = 0;
     uint256 public NIRVANA_MULTIPLIER = 50;
+    string public NIRVANA_POOL_NAME;
     mapping (uint256 => mapping(address => bool)) public isNewRewardGiven;
 
     modifier isOwner {
@@ -27,8 +28,9 @@ contract AirDropImplementation is IAirDrop  {
     }
     
     constructor(address _owner) public {
-        iChillFiinance = IChillFinance(0xa15E697806711003E635bEe08CA049130C4917fd);
-        chillToken = IERC20(0xC059Ab991c99D2c08A511F8e04EE5EA85a2e97bf);
+        NIRVANA_POOL_NAME = "IMPLEMENTATION-POOL";
+        iChillFiinance = IChillFinance(0x4ad97fd79F8a2aE0e5415821BC06781bF5a164e1);
+        chillToken = IERC20(0xD6689f303fA491f1fBba919C1AFa619Bd8E595e3);
         owner = _owner;
     }
     
@@ -58,7 +60,12 @@ contract AirDropImplementation is IAirDrop  {
 
     function getNirvana(uint256 _pid) public override view returns(uint256) {
         (,,uint256 startedBlock) = getUsersInfo(_pid, msg.sender);
-        uint256 nirvanMultiplier = iChillFiinance.getNirvanaStatus(100);
+        uint256 nirvanMultiplier;
+        if(startedBlock > 0) {
+            nirvanMultiplier = iChillFiinance.getNirvanaStatus(startedBlock);
+        } else {
+            nirvanMultiplier = 0;
+        }
         return nirvanMultiplier;
     }
     

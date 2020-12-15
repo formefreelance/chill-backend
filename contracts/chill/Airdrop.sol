@@ -18,6 +18,7 @@ contract AirDrop {
     uint256 public rewardAmount;
     uint256 public scheduleCount = 0;
     uint256 public NIRVANA_MULTIPLIER = 50;
+    string public NIRVANA_POOL_NAME;
     mapping (uint256 => mapping(address => bool)) public isNewRewardGiven;
 
     modifier isOwner {
@@ -26,17 +27,17 @@ contract AirDrop {
     }
     
     constructor(address _owner) public {
-        iChillFiinance = IChillFinance(0xa15E697806711003E635bEe08CA049130C4917fd);
-        chillToken = IERC20(0xC059Ab991c99D2c08A511F8e04EE5EA85a2e97bf);
+        NIRVANA_POOL_NAME = "DAI-ETH";
+        iChillFiinance = IChillFinance(0x4ad97fd79F8a2aE0e5415821BC06781bF5a164e1);
+        chillToken = IERC20(0xD6689f303fA491f1fBba919C1AFa619Bd8E595e3);
         owner = _owner;
-        nirwanaReward = 10; // Nirvana Reward Percentage
+        nirwanaReward = 50; // Nirvana Reward Percentage
         timeSchedule = 28800; // 8 hours
         claimSchedule = 27000; // 15 hours 30 mins
         uint256 currentTimeStamp = block.timestamp;
-        timeStamp = currentTimeStamp.add(timeSchedule);
+        timeStamp = currentTimeStamp;
         claimTimeStamp = currentTimeStamp.add(timeSchedule).add(claimSchedule);
     }
-    
     
     // Contract Implementation Methods (Logic Contracts)
     function addImplementation(address _implementation) public isOwner {
