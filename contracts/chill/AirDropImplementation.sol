@@ -81,7 +81,7 @@ contract AirDropImplementation is IAirDrop  {
         uint256 transferBalance = transferBalancePercent.mul(rewardAmount).div(1e18);
         require(chillToken.balanceOf(address(this)) >= transferBalance.div(1e18), "Not Enough Balance in Nirvana Pool.");
         chillToken.transfer(msg.sender, transferBalance.div(1e18));
-        return true;
+        return true;    
     }
     
     function getAllUsers(uint256 _pid) external override view returns(address[] memory, uint256) {
